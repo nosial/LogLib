@@ -1,0 +1,44 @@
+{
+    "project": {
+        "compiler": {
+            "extension": "php",
+            "minimum_version": "8.0",
+            "maximum_version": "8.2"
+        },
+        "options": []
+    },
+    "assembly": {
+        "name": "LogLib",
+        "package": "net.nosial.loglib",
+        "company": "Nosial",
+        "copyright": "Copyright (c) 2022 Nosial",
+        "version": "1.0.0",
+        "uuid": "de1deca6-7b65-11ed-a8b0-a172264634d8"
+    },
+    "build": {
+        "source_path": "src",
+        "default_configuration": "release",
+        "define_constants": {
+            "ASSEMBLY_NAME": "%ASSEMBLY.NAME%",
+            "ASSEMBLY_PACKAGE": "%ASSEMBLY.PACKAGE%",
+            "ASSEMBLY_VERSION": "%ASSEMBLY.VERSION%",
+            "ASSEMBLY_UID": "%ASSEMBLY.UID%"
+        },
+        "configurations": [
+            {
+                "name": "debug",
+                "output_path": "build/debug",
+                "define_constants": {
+                    "DEBUG": "1"
+                }
+            },
+            {
+                "name": "release",
+                "output_path": "build/release",
+                "define_constants": {
+                    "DEBUG": "0"
+                }
+            }
+        ]
+    }
+}
