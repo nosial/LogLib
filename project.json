@@ -5,6 +5,15 @@
             "minimum_version": "8.0",
             "maximum_version": "8.2"
         },
+        "update_source": {
+            "source": "nosial/libs.log@n64",
+            "repository": {
+                "name": "n64",
+                "type": "gitlab",
+                "host": "git.n64.cc",
+                "ssl": true
+            }
+        },
         "options": []
     },
     "assembly": {
@@ -24,6 +33,20 @@
             "ASSEMBLY_VERSION": "%ASSEMBLY.VERSION%",
             "ASSEMBLY_UID": "%ASSEMBLY.UID%"
         },
+        "dependencies": [
+            {
+                "name": "net.nosial.optslib",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "nosial/libs.opts=latest@n64"
+            },
+            {
+                "name": "net.nosial.properties",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "nosial/libs.properties=latest@n64"
+            }
+        ],
         "configurations": [
             {
                 "name": "debug",

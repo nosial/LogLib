@@ -15,6 +15,7 @@
          *
          * @see LevelType
          * @var string
+         * @property_name level
          */
         public $Level;
 
@@ -22,6 +23,7 @@
          * The Unix Timestamp of when the event was created
          *
          * @var string
+         * @property_name timestamp
          */
         private $Timestamp;
 
@@ -29,6 +31,7 @@
          * An array of backtraces, if any, that were created when the event was created
          *
          * @var Backtrace[]|null
+         * @property_name backtrace
          */
         public $Backtrace;
 
@@ -36,6 +39,7 @@
          * The exception that was thrown, if any
          *
          * @var array|null
+         * @property_name exception
          */
         public $Exception;
 
@@ -43,6 +47,7 @@
          * The message of the event
          *
          * @var string
+         * @property_name message
          */
         public $Message;
 
@@ -60,39 +65,6 @@
         public function setException(Throwable $e): void
         {
             $this->Exception = Utilities::exceptionToArray($e);
-        }
-
-        /**
-         * Returns an array representation of the event
-         *
-         * @return array
-         */
-        public function toArray(): array
-        {
-            return [
-                'level' => ($this->Level ?? null),
-                'timestamp' => ($this->Timestamp ?? null),
-                'backtrace' => $this->Backtrace,
-                'exception' => $this->Exception,
-                'message' => ($this->Message ?? null)
-            ];
-        }
-
-        /**
-         * Constructs a new event from an array representation
-         *
-         * @param array $data
-         * @return Event
-         */
-        public static function fromArray(array $data): Event
-        {
-            $event = new Event();
-            $event->Level = ($data['level'] ?? null);
-            $event->Timestamp = ($data['timestamp'] ?? null);
-            $event->Backtrace = ($data['backtrace'] ?? null);
-            $event->Exception = ($data['exception'] ?? null);
-            $event->Message = ($data['message'] ?? null);
-            return $event;
         }
 
         /**

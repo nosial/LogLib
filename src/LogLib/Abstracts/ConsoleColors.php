@@ -40,4 +40,15 @@
             self::LightGray,
             self::White
         ];
+
+        /**
+         * A list of random usable bright colors
+         */
+        const BrightColors = [
+            self::LightBlue,
+            self::LightGreen,
+            self::LightCyan,
+            self::LightRed,
+            self::LightPurple,
+        ];
     }

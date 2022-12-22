@@ -6,6 +6,7 @@
 
     use LogLib\Abstracts\ConsoleColors;
     use LogLib\Abstracts\LevelType;
+    use LogLib\Log;
     use LogLib\Objects\Event;
     use LogLib\Objects\Options;
 
@@ -24,13 +25,17 @@
          */
         private static function formatAppColor(string $application): string
         {
+            if(!Log::getRuntimeOptions()->isDisplayAnsi())
+                return $application;
+
             if(!isset(self::$ApplicationColors[$application]))
             {
-                $colors = ConsoleColors::All;
+                $colors = ConsoleColors::BrightColors;
                 $color = $colors[array_rand($colors)];
                 self::$ApplicationColors[$application] = $color;
             }
-            return self::$ApplicationColors[$application];
+
+            return self::color($application, self::$ApplicationColors[$application]);
         }
 
         /**
@@ -42,7 +47,10 @@
          */
         private static function color(string $text, string $color): string
         {
-            return "\033[{$color}m$text\033[0m";
+            if(!Log::getRuntimeOptions()->isDisplayAnsi())
+                return $text;
+
+            return "\033[" . $color . "m" . $text . "\033[0m";
         }
 
         /**
@@ -54,6 +62,9 @@
          */
         private static function colorize(Event $event, string $text): string
         {
+            if(!Log::getRuntimeOptions()->isDisplayAnsi())
+                return Utilities::levelToString($text);
+
             $color = null;
             switch($event->Level)
             {
@@ -84,46 +95,6 @@
         }
 
         /**
-         * Returns the formatted backtrace
-         *
-         * @param Event $event
-         * @return string|null
-         */
-        private static function parseBacktrace(Event $event): ?string
-        {
-            $backtrace = null;
-            if($event->Backtrace !== null && count($event->Backtrace) > 0)
-            {
-                foreach($event->Backtrace as $item)
-                {
-                    if($item->Class !== 'LogLib\\Log')
-                    {
-                        $backtrace = $item;
-                        break;
-                    }
-                }
-            }
-
-            $backtrace_output = null;
-            if($backtrace !== null)
-            {
-                if($backtrace->Class !== null)
-                {
-                    $backtrace_output = $backtrace->Class . $backtrace->Type . $backtrace->Function . '()';
-                }
-                else
-                {
-                    $backtrace_output = $backtrace->Function . '()';
-                }
-
-                if($backtrace->Line !== null)
-                    $backtrace_output .= ':' . $backtrace->Line;
-            }
-
-            return $backtrace_output;
-        }
-
-        /**
          * Regular console output for the event object
          *
          * @param Options $options
@@ -132,61 +103,35 @@
          */
         public static function out(Options $options, Event $event): void
         {
-            // If the current level is verbose or higher, then we need to output the backtrace
-            if(Validate::checkLevelType(LevelType::Verbose, $options->getOutputLevel()))
-            {
-                $backtrace_output = self::parseBacktrace($event);
+            if(!Utilities::runningInCli())
+                return;
 
-                if($options->isConsoleAnsiColors())
-                {
-                    print(sprintf(
-                        "%s [%s] [%s] (%s) - %s" . PHP_EOL,
-                        $event->getTimestamp(),
-                        self::formatAppColor($options->getApplicationName()),
-                        self::colorize($event, $event->Level),
-                        $backtrace_output !== null ? $backtrace_output : 'λ',
-                        $event->Message
-                    ));
-                }
-                else
-                {
-                    print(sprintf(
-                        "%s [%s] [%s] - %s - %s" . PHP_EOL,
-                        $event->getTimestamp(), $options->getApplicationName(), $event->Level,
-                        $backtrace_output !== null ? $backtrace_output : 'lambda',
-                        $event->Message
-                    ));
-                }
+            if(Validate::checkLevelType(LevelType::Verbose, Log::getRuntimeOptions()->getLogLevel()))
+            {
+                $backtrace_output = Utilities::parseBacktrace($event);
+
+                print(sprintf(
+                    "%s [%s] [%s] (%s) - %s" . PHP_EOL,
+                    $event->getTimestamp(),
+                    self::formatAppColor($options->getApplicationName()),
+                    self::colorize($event, $event->Level),
+                    $backtrace_output !== null ? $backtrace_output : 'λ',
+                    $event->Message
+                ));
 
                 if($event->Exception !== null)
                     self::outException($event->Exception);
-            }
-            elseif(!Validate::checkLevelType(LevelType::Fatal, $options->getOutputLevel()))
-            {
-                if($options->isConsoleAnsiColors())
-                {
-                    print(sprintf(
-                        "%s [%s] [%s] - %s" . PHP_EOL,
-                        $event->getTimestamp(),
-                        self::formatAppColor($options->getApplicationName()),
-                        self::colorize($event, $event->Level),
-                        $event->Message
-                    ));
-                }
-                else
-                {
-                    print(sprintf(
-                        "%s [%s] [%s] - %s" . PHP_EOL,
-                        $event->getTimestamp(), $options->getApplicationName(), $event->Level,
-                        $event->Message
-                    ));
-                }
 
-                if($event->Exception !== null)
-                    self::outException($event->Exception);
+                return;
             }
 
-
+            print(sprintf(
+                "%s [%s] [%s] - %s" . PHP_EOL,
+                $event->getTimestamp(),
+                self::formatAppColor($options->getApplicationName()),
+                self::colorize($event, $event->Level),
+                $event->Message
+            ));
         }
 
         /**

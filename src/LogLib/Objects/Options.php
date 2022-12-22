@@ -5,9 +5,13 @@
     namespace LogLib\Objects;
 
     use InvalidArgumentException;
-    use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Validate;
     use LogLib\Interfaces\HandlerInterface;
+    use LogLib\Objects\FileLogging\FileHandle;
+    use ncc\Exceptions\InvalidPackageNameException;
+    use ncc\Exceptions\InvalidScopeException;
+    use ncc\Exceptions\PackageLockException;
+    use ncc\Managers\PackageLockManager;
 
     class Options
     {
@@ -15,61 +19,18 @@
          * The name of the application
          *
          * @var string
+         * @property_name application_name
          */
         private $ApplicationName;
-
-        /**
-         * The name of the NCC package that is using LogLib (eg; com.example.package)
-         *
-         * @var string|null
-         */
-        private $PackageName;
-
-        /**
-         * The current output level of the logger, anything below this level will not be logged
-         *
-         * @see LevelType
-         * @var string
-         */
-        private $OutputLevel;
-
-        /**
-         * Indicates whether the log should be written to the console or not.
-         *
-         * @var bool
-         */
-        private $ConsoleOutput;
-
-        /**
-         * Indicates whether ansi colors should be used in the console output.
-         *
-         * @var bool
-         */
-        private $ConsoleAnsiColors;
 
         /**
          * Writes the log to a file located at the package data path provided by NCC's API
          * under a "logs" directory.
          *
          * @var bool
+         * @property_name write_to_package_data
          */
         private $WriteToPackageData;
-
-        /**
-         * Indicates whether the log should be split into different files based on the file size.
-         * Only applies if WriteToPackageData is true.
-         *
-         * @var bool
-         */
-        private $SplitFiles;
-
-        /**
-         * The maximum size of a log file before it is split into a new file.
-         * Only applies if WriteToPackageData is true.
-         *
-         * @var int
-         */
-        private $MaxFileSize;
 
         /**
          * An array of handlers that wil be used to handle the log events
@@ -80,135 +41,77 @@
         private $Handlers;
 
         /**
+         * The file handle to write the log to if WriteToPackageData is true
+         *
+         * @var FileHandle|null
+         */
+        private $FileHandle;
+
+        /**
+         * @var string|null
+         */
+        private $PackageDataPath;
+
+        /**
+         * @var bool
+         */
+        private $DumpExceptions;
+
+        /**
          * Options constructor.
          */
         public function __construct(string $application_name)
         {
             $this->ApplicationName = $application_name;
-            $this->WriteToPackageData = true;
-            $this->SplitFiles = true;
-            $this->MaxFileSize = 1073741824; // 1GB
-            $this->OutputLevel = LevelType::Info;
-            $this->ConsoleOutput = true;
-            $this->ConsoleAnsiColors = true;
+            $this->WriteToPackageData = false;
+            $this->DumpExceptions = false;
             $this->Handlers = [];
         }
 
         /**
-         * @return string|null
-         */
-        public function getPackageName(): ?string
-        {
-            return $this->PackageName;
-        }
-
-        /**
-         * @param string|null $PackageName
-         */
-        public function setPackageName(?string $PackageName): void
-        {
-            $this->PackageName = $PackageName;
-        }
-
-        /**
-         * @return string
-         */
-        public function getOutputLevel(): string
-        {
-            return $this->OutputLevel;
-        }
-
-        /**
-         * @param string $OutputLevel
-         */
-        public function setOutputLevel(string $OutputLevel): void
-        {
-            if(!in_array($OutputLevel, LevelType::All))
-                throw new InvalidArgumentException("Invalid output level provided");
-            $this->OutputLevel = $OutputLevel;
-        }
-
-        /**
          * @return bool
          */
-        public function isConsoleOutput(): bool
-        {
-            return $this->ConsoleOutput;
-        }
-
-        /**
-         * @param bool $ConsoleOutput
-         */
-        public function setConsoleOutput(bool $ConsoleOutput): void
-        {
-            $this->ConsoleOutput = $ConsoleOutput;
-        }
-
-        /**
-         * @return bool
-         */
-        public function isConsoleAnsiColors(): bool
-        {
-            return $this->ConsoleAnsiColors;
-        }
-
-        /**
-         * @param bool $ConsoleAnsiColors
-         */
-        public function setConsoleAnsiColors(bool $ConsoleAnsiColors): void
-        {
-            $this->ConsoleAnsiColors = $ConsoleAnsiColors;
-        }
-
-        /**
-         * @return bool
-         */
-        public function isWriteToPackageData(): bool
+        public function writeToPackageData(): bool
         {
             return $this->WriteToPackageData;
         }
 
         /**
-         * @param bool $WriteToPackageData
+         * Enables the writing of the log to a file located at the package data path provided by NCC's API
+         *
+         * @return void
+         * @throws InvalidPackageNameException
+         * @throws InvalidScopeException
+         * @throws PackageLockException
          */
-        public function setWriteToPackageData(bool $WriteToPackageData): void
+        public function enableWriteToPackageData(): void
         {
-            $this->WriteToPackageData = $WriteToPackageData;
+            if($this->WriteToPackageData)
+                return;
+
+            $package_lock = new PackageLockManager();
+            $package = $package_lock->getPackageLock()->getPackage($this->ApplicationName);
+            if($package == null)
+                throw new InvalidArgumentException("The package data path could not be found for the package '{$this->ApplicationName}'");
+
+            $this->WriteToPackageData = true;
+            $this->PackageDataPath = $package->getDataPath();
+            if($this->FileHandle !== null)
+                unset($this->FileHandle);
+
+            $this->FileHandle = new FileHandle($this->PackageDataPath);
         }
 
         /**
-         * @return bool
+         * Disables the writing of the log to the package data path
+         *
+         * @return void
          */
-        public function isSplitFiles(): bool
+        public function disableWriteToPackageData(): void
         {
-            return $this->SplitFiles;
-        }
-
-        /**
-         * @param bool $SplitFiles
-         */
-        public function setSplitFiles(bool $SplitFiles): void
-        {
-            $this->SplitFiles = $SplitFiles;
-        }
-
-        /**
-         * @return int
-         */
-        public function getMaxFileSize(): int
-        {
-            return $this->MaxFileSize;
-        }
-
-        /**
-         * @param int $MaxFileSize
-         */
-        public function setMaxFileSize(int $MaxFileSize): void
-        {
-            if($MaxFileSize < 1)
-                throw new InvalidArgumentException("Max file size must be greater than 0");
-
-            $this->MaxFileSize = $MaxFileSize;
+            $this->WriteToPackageData = false;
+            $this->PackageDataPath = null;
+            unset($this->FileHandle);
         }
 
         /**
@@ -243,10 +146,52 @@
         }
 
         /**
+         * Returns the name of the Application
+         *
          * @return string
          */
         public function getApplicationName(): string
         {
             return $this->ApplicationName;
         }
+
+        /**
+         * Indicates if exceptions should be dumped to a file
+         *
+         * @return bool
+         */
+        public function dumpExceptionsEnabled(): bool
+        {
+            return $this->DumpExceptions;
+        }
+
+        /**
+         * Enables/Disables the dumping of exceptions to the /exceptions folder of the package data path
+         * WriteToPackageData must be enabled for this to work properly
+         *
+         * @param bool $DumpExceptions
+         */
+        public function setDumpExceptions(bool $DumpExceptions): void
+        {
+            if(!$this->WriteToPackageData)
+                throw new InvalidArgumentException('Cannot dump exceptions if WriteToPackageData is disabled');
+            $this->DumpExceptions = $DumpExceptions;
+        }
+
+        /**
+         * @return FileHandle|null
+         */
+        public function getFileHandle(): ?FileHandle
+        {
+            return $this->FileHandle;
+        }
+
+        /**
+         * @return string|null
+         */
+        public function getPackageDataPath(): ?string
+        {
+            return $this->PackageDataPath;
+        }
+
     }

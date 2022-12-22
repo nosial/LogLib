@@ -10,6 +10,7 @@
          * The function name of the backtrace
          *
          * @var string|null
+         * @property_name function
          */
         public $Function;
 
@@ -17,6 +18,7 @@
          * The line number of the backtrace
          *
          * @var int|null
+         * @property_name line
          */
         public $Line;
 
@@ -24,6 +26,7 @@
          * The file name of the backtrace
          *
          * @var string|null
+         * @property_name file
          */
         public $File;
 
@@ -31,6 +34,7 @@
          * The class name, if any, of the backtrace
          *
          * @var string|null
+         * @property_name class
          */
         public $Class;
 
@@ -41,6 +45,7 @@
          *
          * @see CallType
          * @var string|null
+         * @property_name type
          */
         public $Type;
 
@@ -49,41 +54,7 @@
          * an included file, this lists the included file name(s).
          *
          * @var array|null
+         * @property_name args
          */
         public $Args;
-
-        /**
-         * Returns an array representation of the backtrace
-         *
-         * @return array
-         */
-        public function toArray(): array
-        {
-            return [
-                'function' => $this->Function,
-                'line' => $this->Line,
-                'file' => $this->File,
-                'class' => $this->Class,
-                'type' => $this->Type,
-                'args' => $this->Args
-            ];
-        }
-
-        /**
-         * Constructs a new DebugBacktrace object from an array representation
-         *
-         * @param array $array
-         * @return Backtrace
-         */
-        public static function fromArray(array $array): Backtrace
-        {
-            $backtrace = new Backtrace();
-            $backtrace->Function = ($array['function'] ?? null);
-            $backtrace->Line = ($array['line'] ?? null);
-            $backtrace->File = ($array['file'] ?? null);
-            $backtrace->Class = ($array['class'] ?? null);
-            $backtrace->Type = ($array['type'] ?? null);
-            $backtrace->Args = ($array['args'] ?? null);
-            return $backtrace;
-        }
     }
