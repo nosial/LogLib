@@ -7,7 +7,6 @@
     use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Utilities;
     use Throwable;
-
     class Event
     {
         /**
@@ -33,7 +32,7 @@
          * @var Backtrace[]|null
          * @property_name backtrace
          */
-        public $Backtrace;
+        private $Backtrace;
 
         /**
          * The exception that was thrown, if any
@@ -53,7 +52,7 @@
 
         public function __construct()
         {
-            $this->Timestamp = date('Y-m-dTH:i:s.v') . (date('p') == 'Z' ? 'Z' : 'L');
+            $this->Timestamp = date('c');
         }
 
         /**
@@ -73,6 +72,22 @@
         public function getTimestamp(): string
         {
             return $this->Timestamp;
+        }
+
+        /**
+         * @return array|null
+         */
+        public function getBacktrace(): ?array
+        {
+            return $this->Backtrace;
+        }
+
+        /**
+         * @param array|null $Backtrace
+         */
+        public function setBacktrace(?array $Backtrace): void
+        {
+            $this->Backtrace = $Backtrace;
         }
 
     }

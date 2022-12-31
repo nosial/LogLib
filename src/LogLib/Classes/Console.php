@@ -108,15 +108,14 @@
 
             if(Validate::checkLevelType(LevelType::Verbose, Log::getRuntimeOptions()->getLogLevel()))
             {
-                $backtrace_output = Utilities::parseBacktrace($event);
+                $backtrace_output = Utilities::getTraceString($event, Log::getRuntimeOptions()->isDisplayAnsi());
 
                 print(sprintf(
-                    "%s [%s] [%s] (%s) - %s" . PHP_EOL,
+                    "%s [%s] [%s] %s %s" . PHP_EOL,
                     $event->getTimestamp(),
                     self::formatAppColor($options->getApplicationName()),
                     self::colorize($event, $event->Level),
-                    $backtrace_output !== null ? $backtrace_output : 'λ',
-                    $event->Message
+                    $backtrace_output, $event->Message
                 ));
 
                 if($event->Exception !== null)
@@ -126,7 +125,7 @@
             }
 
             print(sprintf(
-                "%s [%s] [%s] - %s" . PHP_EOL,
+                "%s [%s] [%s] %s" . PHP_EOL,
                 $event->getTimestamp(),
                 self::formatAppColor($options->getApplicationName()),
                 self::colorize($event, $event->Level),

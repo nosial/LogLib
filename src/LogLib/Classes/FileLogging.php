@@ -21,14 +21,11 @@
          */
         public static function out(Options $options, Event $event, ?FileHandle $fileHandle=null): void
         {
-            $backtrace_output = Utilities::parseBacktrace($event);
+            $backtrace_output = Utilities::getTraceString($event);
             $handle = $fileHandle ?? $options->getFileHandle();
 
             switch($event->Level)
             {
-                // Only process Debug/Verbose events if the log level is set to Debug/Verbose
-                // otherwise omit it because it could be a performance hit if there are a lot of
-                // debug/verbose events being logged.
                 case LevelType::Debug:
                 case LevelType::Verbose:
                     if(!Validate::checkLevelType($event->Level, Log::getRuntimeOptions()->getLogLevel()))
@@ -40,7 +37,7 @@
             }
 
             $handle->fwrite(sprintf(
-                "%s [%s] [%s] (%s) - %s" . PHP_EOL,
+                "%s [%s] [%s] (%s) %s" . PHP_EOL,
                 $event->getTimestamp(),
                 $options->getApplicationName(),
                 Utilities::levelToString($event->Level),

@@ -6,17 +6,16 @@
     use LogLib\Objects\Backtrace;
     use LogLib\Objects\Event;
     use OptsLib\Parse;
-    use Properties\Prop;
-    use Throwable;
 
     class Utilities
     {
         /**
          * Returns the current backtrace
          *
-         * @return Backtrace[]
+         * @param bool $full
+         * @return array
          */
-        public static function getBacktrace(): array
+        public static function getBacktrace(bool $full=false): array
         {
             if(!function_exists('debug_backtrace'))
                 return [];
@@ -26,31 +25,10 @@
 
             foreach($backtrace as $trace)
             {
-                $results[] = Prop::fromArray($trace);
-            }
+                if(isset($trace['class'] ) && str_contains($trace['class'], 'LogLib') && !$full)
+                    continue;
 
-            return $results;
-        }
-
-        /**
-         * @param Throwable $e
-         * @return array
-         */
-        public static function exceptionToArray(Throwable  $e): array
-        {
-            $results = [
-                'hash' => spl_object_hash($e),
-                'type' => get_class($e),
-                'message' => $e->getMessage(),
-                'code' => $e->getCode(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTrace(),
-            ];
-
-            if($e->getPrevious() !== null)
-            {
-                $results['previous'] = self::exceptionToArray($e->getPrevious());
+                $results[] = new Backtrace($trace);
             }
 
             return $results;
@@ -124,6 +102,7 @@
                 case 'vrb':
                     return LevelType::Verbose;
 
+                default:
                 case LevelType::Info:
                 case 'info':
                 case '4':
@@ -153,9 +132,6 @@
                 case '0':
                 case 'sil':
                     return LevelType::Silent;
-
-                default:
-                    return LevelType::Info;
             }
         }
 
@@ -203,46 +179,6 @@
         }
 
         /**
-         * Returns the formatted backtrace
-         *
-         * @param Event $event
-         * @return string|null
-         */
-        public static function parseBacktrace(Event $event): ?string
-        {
-            $backtrace = null;
-            if ($event->Backtrace !== null && count($event->Backtrace) > 0)
-            {
-                foreach ($event->Backtrace as $item)
-                {
-                    if ($item->Class !== 'LogLib\\Log')
-                    {
-                        $backtrace = $item;
-                        break;
-                    }
-                }
-            }
-
-            $backtrace_output = null;
-            if ($backtrace !== null)
-            {
-                if ($backtrace->Class !== null)
-                {
-                    $backtrace_output = $backtrace->Class . $backtrace->Type . $backtrace->Function . '()';
-                }
-                else
-                {
-                    $backtrace_output = $backtrace->Function . '()';
-                }
-
-                if ($backtrace->Line !== null)
-                    $backtrace_output .= ':' . $backtrace->Line;
-            }
-
-            return $backtrace_output;
-        }
-
-        /**
          * Returns a random string of characters
          *
          * @param int $length
@@ -258,6 +194,33 @@
                 $randomString .= $characters[rand(0, $charactersLength - 1)];
             }
             return $randomString;
+        }
+
+        /**
+         * @param Event $event
+         * @param bool $ansi
+         * @return string|null
+         */
+        public static function getTraceString(Event $event, bool $ansi=false): ?string
+        {
+            if($event->getBacktrace() == null)
+                return 'λ';
+
+            $backtrace = $event->getBacktrace()[0];
+            $function = $backtrace->getFunction();
+            $class = $backtrace->getClass();
+
+            if($ansi)
+            {
+                $function = "\033[1;37m$function\033[0m";
+                $class = "\033[1;37m$class\033[0m";
+            }
+
+            if($class == null)
+                return "{$function}()";
+
+            $type = ($backtrace->getType() == '->' ? '->' : '::');
+            return "{$class}{$type}{$function}()";
         }
 
     }
