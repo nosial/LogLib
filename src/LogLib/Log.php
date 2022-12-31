@@ -13,7 +13,6 @@
     use LogLib\Objects\Event;
     use LogLib\Objects\Options;
     use LogLib\Objects\RuntimeOptions;
-    use Properties\Exceptions\ReconstructException;
     use Throwable;
 
     class Log
@@ -99,7 +98,6 @@
          * @param string|null $message The message of the event
          * @param Throwable|null $throwable The exception that was thrown, if any
          * @return void
-         * @throws ReconstructException
          */
         private static function log(string $application_name, string $level=LevelType::Info, ?string $message=null, ?Throwable $throwable=null): void
         {
