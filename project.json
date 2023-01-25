@@ -39,12 +39,6 @@
                 "version": "latest",
                 "source_type": "remote",
                 "source": "nosial/libs.opts=latest@n64"
-            },
-            {
-                "name": "net.nosial.properties",
-                "version": "latest",
-                "source_type": "remote",
-                "source": "nosial/libs.properties=latest@n64"
             }
         ],
         "configurations": [
