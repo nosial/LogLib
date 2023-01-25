@@ -43,13 +43,6 @@
         ],
         "configurations": [
             {
-                "name": "debug",
-                "output_path": "build/debug",
-                "define_constants": {
-                    "DEBUG": "1"
-                }
-            },
-            {
                 "name": "release",
                 "output_path": "build/release",
                 "define_constants": {
