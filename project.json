@@ -38,10 +38,7 @@
         "configurations": [
             {
                 "name": "release",
-                "output_path": "build/release",
-                "define_constants": {
-                    "DEBUG": "0"
-                }
+                "output_path": "build/release"
             }
         ]
     }
