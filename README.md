@@ -11,6 +11,9 @@ NCC's capabilities for PHP.
   * [Table of Contents](#table-of-contents)
   * [Installation](#installation)
   * [Compiling from source](#compiling-from-source)
+  * [Usage](#usage)
+  * [Changelog](#changelog)
+  * [License](#license)
 <!-- TOC -->
 
 
@@ -54,3 +57,55 @@ or by running the following command:
 ```bash
 make release
 ```
+
+
+## Usage
+
+The usage of this library is very simple, there are
+multiple error levels that can be used to log messages
+
+```php
+<?php
+  
+  use Nosial\Libs\Log;
+  
+  Log::info("This is an info message");
+  Log::warning("This is a warning message");
+  Log::error("This is an error message");
+  Log::debug("This is a debug message");
+  Log::critical("This is a critical message");
+```
+
+To display the log messages, you can run your program
+with the `--log-level` argument, this will display all
+messages with a level equal to or higher than the one
+specified.
+
+```bash
+myprogram --log-level info
+```
+
+The log level can be set to one of the following:
+
+* `debug`, `6`, `dbg`
+* `verbose`, `5`, `vrb`
+* `info`, `4`, `inf`
+* `warning`, `3`, `wrn`
+* `error`, `2`, `err`
+* `fatal`, `1`, `ftl`
+* `silent`, `0`, `sil`
+
+The default log level is `info`.
+
+ > Note: Log messages are only displayed if the program
+is run from the command line, if you are running the
+program from a web server, the log messages will be shown
+ 
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md)
+
+## License
+
+LogLib is licensed under the MIT license, see [LICENSE](LICENSE)
