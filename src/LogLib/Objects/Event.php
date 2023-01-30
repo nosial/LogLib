@@ -22,7 +22,6 @@
          * The Unix Timestamp of when the event was created
          *
          * @var string
-         * @property_name timestamp
          */
         private $Timestamp;
 
@@ -30,15 +29,13 @@
          * An array of backtraces, if any, that were created when the event was created
          *
          * @var Backtrace[]|null
-         * @property_name backtrace
          */
         private $Backtrace;
 
         /**
          * The exception that was thrown, if any
          *
-         * @var array|null
-         * @property_name exception
+         * @var Throwable|null
          */
         public $Exception;
 
@@ -46,10 +43,12 @@
          * The message of the event
          *
          * @var string
-         * @property_name message
          */
         public $Message;
 
+        /**
+         * Public Constructor
+         */
         public function __construct()
         {
             $this->Timestamp = date('c');

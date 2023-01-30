@@ -1,6 +1,3 @@
-debug:
-	ncc build --config="debug"
-
 release:
 	ncc build --config="release"
 

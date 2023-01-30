@@ -5,8 +5,6 @@
     abstract class CallType
     {
         const MethodCall = '->';
-
         const StaticCall = '::';
-
         const FunctionCall = ' ';
     }

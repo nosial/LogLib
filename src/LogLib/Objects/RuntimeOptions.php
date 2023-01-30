@@ -7,7 +7,6 @@
     use InvalidArgumentException;
     use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Utilities;
-    use LogLib\Objects\FileLogging\FileHandle;
 
     class RuntimeOptions
     {
@@ -36,25 +35,12 @@
         private $HandleExceptions;
 
         /**
-         * Optional. The file to write the log to.
-         *
-         * @var string|null
-         * @property_name output_log
-         */
-        private $OutputLog;
-
-        /**
          * The current log level
          *
          * @var int
          * @see LevelType
          */
         private $LogLevel;
-
-        /**
-         * @var FileHandle
-         */
-        private $OutputLogHandle;
 
         /**
          * Public Constructor
@@ -64,7 +50,6 @@
             $this->ConsoleOutput = Utilities::runningInCli();
             $this->DisplayAnsi = Utilities::getDisplayAnsi();
             $this->HandleExceptions = true;
-            $this->OutputLog = Utilities::getOutputLogPath();
             $this->LogLevel = Utilities::getLogLevel();
         }
 
@@ -130,24 +115,5 @@
         public function setLogLevel(int $LogLevel): void
         {
             $this->LogLevel = $LogLevel;
-        }
-
-        /**
-         * @return ?FileHandle
-         */
-        public function getOutputLogHandle(): ?FileHandle
-        {
-            if($this->OutputLogHandle == null)
-            {
-                if($this->OutputLog == null)
-                    return null;
-
-                if(is_writable($this->OutputLog) === false)
-                    throw new InvalidArgumentException(sprintf('The path "%s" is not writable', $this->OutputLog));
-
-                $this->OutputLogHandle = new FileHandle($this->OutputLog);
-            }
-
-            return $this->OutputLogHandle;
         }
     }

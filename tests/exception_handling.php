@@ -9,6 +9,7 @@
 
     $options = new Options('net.nosial.optslib');
     Log::register($options);
+    Log::registerExceptionHandler();
 
     Log::debug('net.nosial.optslib', 'This is a debug message');
     Log::verbose('net.nosial.optslib', 'This is a verbose message');
@@ -16,3 +17,5 @@
     Log::warning('net.nosial.optslib', 'This is a warning message');
     Log::error('net.nosial.optslib', 'This is an error message');
     Log::fatal('net.nosial.optslib', 'This is a fatal message');
+
+    throw new Exception('This is an exception');

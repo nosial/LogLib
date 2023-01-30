@@ -7,7 +7,6 @@
     use InvalidArgumentException;
     use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Console;
-    use LogLib\Classes\FileLogging;
     use LogLib\Classes\Utilities;
     use LogLib\Classes\Validate;
     use LogLib\Objects\Event;
@@ -17,7 +16,6 @@
 
     class Log
     {
-
         /**
          * @var Options[]
          */
@@ -121,18 +119,6 @@
 
             if(self::getRuntimeOptions()->isConsoleOutput())
                 Console::out($application, $event);
-
-            if($application->writeToPackageData())
-                FileLogging::out($application, $event);
-
-            foreach($application->getHandlers() as $event_level => $handlers)
-            {
-                if(Validate::checkLevelType($event_level, $level))
-                {
-                    foreach($handlers as $handler)
-                        $handler->handle($event);
-                }
-            }
         }
 
         /**
@@ -206,7 +192,7 @@
         public static function registerExceptionHandler(): void
         {
             set_exception_handler(function(Throwable $throwable) {
-                self::error('Exception', $throwable->getMessage(), $throwable);
+                self::error('Runtime', $throwable->getMessage(), $throwable);
             });
         }
 

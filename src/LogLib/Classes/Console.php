@@ -9,6 +9,7 @@
     use LogLib\Log;
     use LogLib\Objects\Event;
     use LogLib\Objects\Options;
+    use Throwable;
 
     class Console
     {
@@ -136,16 +137,18 @@
         /**
          * Prints out the exception details
          *
-         * @param array $exception
+         * @param Throwable $exception
          * @return void
          */
-        private static function outException(array $exception): void
+        private static function outException(Throwable $exception): void
         {
-            $trace_header = self::color($exception['file'] . ':' . $exception['line'], ConsoleColors::Purple);
+            $trace_header = self::color($exception->getFile() . ':' . $exception->getLine(), ConsoleColors::Purple);
             $trace_error = self::color('error: ', ConsoleColors::Red);
-            print($trace_header . ' ' . $trace_error . $exception['message'] . PHP_EOL);
-            print(sprintf('Error code: %s', $exception['code']) . PHP_EOL);
-            $trace = $exception['trace'];
+
+            print($trace_header . ' ' . $trace_error . $exception->getMessage() . PHP_EOL);
+            print(sprintf('Error code: %s', $exception->getCode()) . PHP_EOL);
+            $trace = $exception->getTrace();
+
             if(count($trace) > 1)
             {
                 print('Stack Trace:' . PHP_EOL);
@@ -155,7 +158,7 @@
                 }
             }
 
-            if($exception['previous'] !== null)
+            if($exception->getPrevious() !== null)
             {
                 print('Previous Exception:' . PHP_EOL);
                 self::outException($exception['previous']);

@@ -6,6 +6,7 @@
     use LogLib\Objects\Backtrace;
     use LogLib\Objects\Event;
     use OptsLib\Parse;
+    use Throwable;
 
     class Utilities
     {
@@ -136,22 +137,6 @@
         }
 
         /**
-         * Returns the output log path from the command line arguments
-         *
-         * @return string|null
-         */
-        public static function getOutputLogPath(): ?string
-        {
-            $args = Parse::getArguments();
-            $path = ($args['log-path'] ?? $args['log-file'] ?? null);
-
-            if($path === null)
-                return null;
-
-            return $path;
-        }
-
-        /**
          * @return bool
          */
         public static function getDisplayAnsi(): bool
@@ -173,7 +158,7 @@
          *
          * @return string
          */
-        public static function getLogFilename()
+        public static function getLogFilename(): string
         {
            return date('Y-m-d') . '.log';
         }
@@ -221,6 +206,31 @@
 
             $type = ($backtrace->getType() == '->' ? '->' : '::');
             return "{$class}{$type}{$function}()";
+        }
+
+        /**
+         * Returns an array representation of a throwable exception
+         *
+         * @param Throwable $e
+         * @return array
+         */
+        public static function exceptionToArray(Throwable $e): array
+        {
+            $trace = $e->getTrace();
+            $trace_string = '';
+
+            foreach($trace as $t)
+            {
+                $trace_string .= "\t{$t['file']}:{$t['line']} {$t['class']}{$t['type']}{$t['function']}()\n";
+            }
+
+            return [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $trace_string,
+            ];
         }
 
     }
