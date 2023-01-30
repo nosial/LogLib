@@ -70,14 +70,13 @@ multiple error levels that can be used to log messages
   require 'ncc';
   import('net.nosial.loglib');
 
-  use Nosial\Libs\Log;
-  
-  
-  Log::info("This is an info message");
-  Log::warning("This is a warning message");
-  Log::error("This is an error message");
-  Log::debug("This is a debug message");
-  Log::critical("This is a critical message");
+  \LogLib\Log::debug('This is a debug message');
+  \LogLib\Log::verbose('This is a verbose message');
+  \LogLib\Log::info('This is an info message');
+  \LogLib\Log::warning('This is a warning message');
+  \LogLib\Log::error('This is an error message');
+  \LogLib\Log::fatal('This is a fatal message');
+
 ```
 
 To display the log messages, you can run your program
