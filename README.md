@@ -67,7 +67,11 @@ multiple error levels that can be used to log messages
 ```php
 <?php
   
+  require 'ncc';
+  import('net.nosial.loglib');
+
   use Nosial\Libs\Log;
+  
   
   Log::info("This is an info message");
   Log::warning("This is a warning message");
