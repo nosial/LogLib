@@ -1,3 +1,5 @@
-# 1.0.0
+# Changelog
 
-First release of LogLib
+## Release 1.0.0
+
+* First Release
