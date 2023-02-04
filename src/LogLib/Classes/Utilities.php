@@ -84,7 +84,7 @@
         {
             $args = Parse::getArguments();
 
-            $selected_level = ($args['log'] ?? $args['log-level'] ?? null);
+            $selected_level = ($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: null) ?? null);
 
             if($selected_level === null)
                 return LevelType::Info;
