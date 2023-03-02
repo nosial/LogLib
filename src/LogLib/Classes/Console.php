@@ -162,7 +162,7 @@
                 $backtrace_output = Utilities::getTraceString($event, Log::getRuntimeOptions()->isDisplayAnsi());
 
                 print(sprintf(
-                    "%s [%s] [%s] %s %s" . PHP_EOL,
+                    "[%s] [%s] [%s] %s %s" . PHP_EOL,
                     self::getTimestamp(),
                     self::formatAppColor($options->getApplicationName()),
                     self::colorize($event, $event->Level),
@@ -176,7 +176,7 @@
             }
 
             print(sprintf(
-                "%s [%s] [%s] %s" . PHP_EOL,
+                "[%s] [%s] [%s] %s" . PHP_EOL,
                 self::getTimestamp(),
                 self::formatAppColor($options->getApplicationName()),
                 self::colorize($event, $event->Level),
