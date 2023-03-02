@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.2] - Unreleased
 
+### Changed 
+ * Changed the Timestamp format to display micro time instead of a date format
+
 ## [1.0.1] - 2023-02-10
 
 ### Added
