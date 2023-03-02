@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added PSR compatible LoggerInterface implementation (\LogLib\Psr)
 * Added new option `--log-level` to set the log level (Can also be applied via the environment variable `LOG_LEVEL`)
 
-
 ## [1.0.0] - 2023-01-29
 
 ### Added
