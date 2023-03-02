@@ -19,13 +19,6 @@
         public $Level;
 
         /**
-         * The Unix Timestamp of when the event was created
-         *
-         * @var string
-         */
-        private $Timestamp;
-
-        /**
          * An array of backtraces, if any, that were created when the event was created
          *
          * @var Backtrace[]|null
@@ -47,14 +40,6 @@
         public $Message;
 
         /**
-         * Public Constructor
-         */
-        public function __construct()
-        {
-            $this->Timestamp = date('c');
-        }
-
-        /**
          * Sets an exception to the event
          *
          * @param Throwable $e
@@ -63,14 +48,6 @@
         public function setException(Throwable $e): void
         {
             $this->Exception = Utilities::exceptionToArray($e);
-        }
-
-        /**
-         * @return string
-         */
-        public function getTimestamp(): string
-        {
-            return $this->Timestamp;
         }
 
         /**
