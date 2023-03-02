@@ -16,7 +16,18 @@
         /**
          * @var array
          */
-        private static $ApplicationColors = [];
+        private static $application_colors = [];
+
+
+        /**
+         * @var float|int
+         */
+        private static $last_tick_time;
+
+        /**
+         * @var int
+         */
+        private static $largest_tick_length;
 
         /**
          * Formats the application color for the console
@@ -29,14 +40,14 @@
             if(!Log::getRuntimeOptions()->isDisplayAnsi())
                 return $application;
 
-            if(!isset(self::$ApplicationColors[$application]))
+            if(!isset(self::$application_colors[$application]))
             {
                 $colors = ConsoleColors::BrightColors;
                 $color = $colors[array_rand($colors)];
-                self::$ApplicationColors[$application] = $color;
+                self::$application_colors[$application] = $color;
             }
 
-            return self::color($application, self::$ApplicationColors[$application]);
+            return self::color($application, self::$application_colors[$application]);
         }
 
         /**
@@ -96,6 +107,45 @@
         }
 
         /**
+         * Returns the current timestamp tick
+         *
+         * @return string
+         */
+        private static function getTimestamp(): string
+        {
+            $tick_time = (string)microtime(true);
+
+            if(strlen($tick_time) > self::$largest_tick_length)
+            {
+                self::$largest_tick_length = strlen($tick_time);
+            }
+
+            if(strlen($tick_time) < self::$largest_tick_length)
+            {
+                /** @noinspection PhpRedundantOptionalArgumentInspection */
+                $tick_time = str_pad($tick_time, (strlen($tick_time) + (self::$largest_tick_length - strlen($tick_time))), ' ', STR_PAD_RIGHT);
+            }
+
+            $fmt_tick = $tick_time;
+            if(self::$last_tick_time !== null)
+            {
+                $timeDiff = microtime(true) - self::$last_tick_time;
+
+                if ($timeDiff > 1.0)
+                {
+                    $fmt_tick = \ncc\Utilities\Console::formatColor($tick_time, \ncc\Abstracts\ConsoleColors::LightRed);
+                }
+                elseif ($timeDiff > 0.5)
+                {
+                    $fmt_tick = self::color($tick_time, ConsoleColors::Yellow);
+                }
+            }
+
+            self::$last_tick_time = $tick_time;
+            return $fmt_tick;
+        }
+
+        /**
          * Regular console output for the event object
          *
          * @param Options $options
@@ -113,7 +163,7 @@
 
                 print(sprintf(
                     "%s [%s] [%s] %s %s" . PHP_EOL,
-                    $event->getTimestamp(),
+                    self::getTimestamp(),
                     self::formatAppColor($options->getApplicationName()),
                     self::colorize($event, $event->Level),
                     $backtrace_output, $event->Message
@@ -127,7 +177,7 @@
 
             print(sprintf(
                 "%s [%s] [%s] %s" . PHP_EOL,
-                $event->getTimestamp(),
+                self::getTimestamp(),
                 self::formatAppColor($options->getApplicationName()),
                 self::colorize($event, $event->Level),
                 $event->Message
