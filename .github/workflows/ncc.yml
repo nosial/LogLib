@@ -1,0 +1,47 @@
+name: NCC Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: common,zip
+
+      - name: Install dependencies
+        run: |
+          apt update -yqq
+          apt install git libpq-dev zip make wget gnupg -yqq
+
+          # Install phive
+          wget -O phive.phar https://phar.io/releases/phive.phar
+          wget -O phive.phar.asc https://phar.io/releases/phive.phar.asc
+          gpg --keyserver hkps://keys.openpgp.org --recv-keys 0x9D8A98B29B2D5D79
+          gpg --verify phive.phar.asc phive.phar
+          chmod +x phive.phar
+          mv phive.phar /usr/local/bin/phive
+
+          # Install phab
+          phive install phpab --global --trust-gpg-keys 0x2A8299CE842DD38C
+
+          # Install the latest version of ncc (Nosial Code Compiler)
+          git clone https://git.n64.cc/nosial/ncc.git
+          cd ncc
+          make redist
+          php build/src/INSTALL --auto --install-composer
+          cd .. && rm -rf ncc
+      
+      - name: Build release
+        run: ncc build --config release --log-level debug
