@@ -22,8 +22,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt update -yqq
-          apt install git libpq-dev zip make wget gnupg -yqq
+          sudo apt update -yqq
+          sudo apt install git libpq-dev zip make wget gnupg -yqq
 
           # Install phive
           wget -O phive.phar https://phar.io/releases/phive.phar
@@ -34,13 +34,13 @@ jobs:
           mv phive.phar /usr/local/bin/phive
 
           # Install phab
-          phive install phpab --global --trust-gpg-keys 0x2A8299CE842DD38C
+          sudo phive install phpab --global --trust-gpg-keys 0x2A8299CE842DD38C
 
           # Install the latest version of ncc (Nosial Code Compiler)
           git clone https://git.n64.cc/nosial/ncc.git
           cd ncc
           make redist
-          php build/src/INSTALL --auto --install-composer
+          sudo php build/src/INSTALL --auto --install-composer
           cd .. && rm -rf ncc
       
       - name: Build release
