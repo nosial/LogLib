@@ -211,7 +211,7 @@
             if($exception->getPrevious() !== null)
             {
                 print('Previous Exception:' . PHP_EOL);
-                self::outException($exception['previous']);
+                self::outException($exception->getPrevious());
             }
         }
     }

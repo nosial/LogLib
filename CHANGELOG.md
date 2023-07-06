@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed 
  * Changed the Timestamp format to display micro time instead of a date format
+ * Timestamp Formats can now display in red or yellow to indicate performance impacts between log entries
+
+### Fixed
+ * Fixed mistake in `\LogLib\Classes > Console > outException()` where the function attempts to print out a previous
+   exception by calling `getPrevious()` as an array instead of a function call.
 
 ## [1.0.1] - 2023-02-10
 
