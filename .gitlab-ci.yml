@@ -11,7 +11,6 @@ variables:
 build:
     stage: build
     script:
-        - ncc project install
         - ncc build --config release --log-level debug -o "build/release/net.nosial.loglib.ncc"
     artifacts:
         paths:
