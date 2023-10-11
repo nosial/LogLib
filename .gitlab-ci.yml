@@ -1,11 +1,17 @@
 image: repo.n64.cc:443/nosial/ncc:latest
 
 stages:
+    - prepare
     - build
     - publish
 
 variables:
     PACKAGE_NAME: $CI_COMMIT_REF_NAME
+
+prepare:
+    stage: prepare
+    script:
+        - ncc project install
 
 build:
     stage: build
