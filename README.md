@@ -32,7 +32,6 @@ the `build.dependencies` section:
 {
   "name": "net.nosial.loglib",
   "version": "latest",
-  "source_type": "remote",
   "source": "nosial/libs.log=latest@n64"
 }
 ```
@@ -70,12 +69,12 @@ multiple error levels that can be used to log messages
   require 'ncc';
   import('net.nosial.loglib');
 
-  \LogLib\Log::debug('This is a debug message');
-  \LogLib\Log::verbose('This is a verbose message');
-  \LogLib\Log::info('This is an info message');
-  \LogLib\Log::warning('This is a warning message');
-  \LogLib\Log::error('This is an error message');
-  \LogLib\Log::fatal('This is a fatal message');
+  \LogLib\Log::debug('com.example.lib', 'This is a debug message');
+  \LogLib\Log::verbose('com.example.lib', 'This is a verbose message');
+  \LogLib\Log::info('com.example.lib', 'This is an info message');
+  \LogLib\Log::warning('com.example.lib', 'This is a warning message');
+  \LogLib\Log::error('com.example.lib', 'This is an error message');
+  \LogLib\Log::fatal('com.example.lib', 'This is a fatal message');
 
 ```
 

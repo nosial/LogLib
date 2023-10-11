@@ -7,102 +7,94 @@
     class Validate
     {
         /**
-         * Validates that the level is valid
+         * Checks if the given level is a valid level type.
          *
-         * @param string $level
-         * @return bool
+         * @param string $level The level to check.
+         * @return bool Returns true if the level is valid
          */
         public static function LevelType(string $level): bool
         {
-            return in_array($level, LevelType::All);
+            return in_array($level, LevelType::ALL);
         }
 
         /**
-         * Checks if the input level matches the current level
+         * Checks if the given input level is valid for the current level.
          *
-         * @param string $input
-         * @param string $current_level
-         * @return bool
+         * @param string $input The input level to check.
+         * @param string $current_level The current level to compare against.
+         * @return bool Returns true if the input level is valid for the current level, false otherwise.
          */
         public static function checkLevelType(string $input, string $current_level): bool
         {
-            if($input == null)
-                return false;
-            if($current_level == null)
-                return false;
-
             $input = strtolower($input);
-            if(!Validate::LevelType($input))
+            if(!self::LevelType($input))
+            {
                 return false;
+            }
 
             $current_level = strtolower($current_level);
-            if(!Validate::LevelType($current_level))
+            if(!self::LevelType($current_level))
+            {
                 return false;
+            }
 
             switch($current_level)
             {
-                case LevelType::Debug:
+                case LevelType::DEBUG:
                     $levels = [
-                        LevelType::Debug,
-                        LevelType::Verbose,
-                        LevelType::Info,
-                        LevelType::Warning,
-                        LevelType::Fatal,
-                        LevelType::Error
+                        LevelType::DEBUG,
+                        LevelType::VERBOSE,
+                        LevelType::INFO,
+                        LevelType::WARNING,
+                        LevelType::FATAL,
+                        LevelType::ERROR
                     ];
-                    if(in_array($input, $levels))
-                        return true;
-                    return false;
 
-                case LevelType::Verbose:
+                    return in_array($input, $levels, true);
+
+                case LevelType::VERBOSE:
                     $levels = [
-                        LevelType::Verbose,
-                        LevelType::Info,
-                        LevelType::Warning,
-                        LevelType::Fatal,
-                        LevelType::Error
+                        LevelType::VERBOSE,
+                        LevelType::INFO,
+                        LevelType::WARNING,
+                        LevelType::FATAL,
+                        LevelType::ERROR
                     ];
-                    if(in_array($input, $levels))
-                        return true;
-                    return false;
 
-                case LevelType::Info:
+                    return in_array($input, $levels, true);
+
+                case LevelType::INFO:
                     $levels = [
-                        LevelType::Info,
-                        LevelType::Warning,
-                        LevelType::Fatal,
-                        LevelType::Error
+                        LevelType::INFO,
+                        LevelType::WARNING,
+                        LevelType::FATAL,
+                        LevelType::ERROR
                     ];
-                    if(in_array($input, $levels))
-                        return true;
-                    return false;
 
-                case LevelType::Warning:
+                    return in_array($input, $levels, true);
+
+                case LevelType::WARNING:
                     $levels = [
-                        LevelType::Warning,
-                        LevelType::Fatal,
-                        LevelType::Error
+                        LevelType::WARNING,
+                        LevelType::FATAL,
+                        LevelType::ERROR
                     ];
-                    if(in_array($input, $levels))
-                        return true;
-                    return false;
 
-                case LevelType::Error:
+                    return in_array($input, $levels, true);
+
+                case LevelType::ERROR:
                     $levels = [
-                        LevelType::Fatal,
-                        LevelType::Error
+                        LevelType::FATAL,
+                        LevelType::ERROR
                     ];
-                    if(in_array($input, $levels))
-                        return true;
-                    return false;
 
-                case LevelType::Fatal:
-                    if($input == LevelType::Fatal)
-                        return true;
-                    return false;
+                    return in_array($input, $levels, true);
+
+                case LevelType::FATAL:
+                    return $input === LevelType::FATAL;
 
                 default:
-                case LevelType::Silent:
+                case LevelType::SILENT:
                     return false;
             }
         }

@@ -2,6 +2,7 @@
 
     namespace LogLib\Classes;
 
+    use LogLib\Abstracts\CallType;
     use LogLib\Abstracts\LevelType;
     use LogLib\Objects\Backtrace;
     use LogLib\Objects\Event;
@@ -11,23 +12,29 @@
     class Utilities
     {
         /**
-         * Returns the current backtrace
+         * Returns a backtrace of the calling code.
          *
-         * @param bool $full
-         * @return array
+         * @param bool $full Determines whether the full backtrace should be returned or not. Default is false.
+         * @return array An array containing backtrace information.
+         *                Each element in the array represents a single call in the call stack and is an instance of the Backtrace class.
+         *                If the debug_backtrace () function is not available, an empty array will be returned.
          */
         public static function getBacktrace(bool $full=false): array
         {
             if(!function_exists('debug_backtrace'))
+            {
                 return [];
+            }
 
             $backtrace = debug_backtrace();
             $results = [];
 
             foreach($backtrace as $trace)
             {
-                if(isset($trace['class'] ) && str_contains($trace['class'], 'LogLib') && !$full)
+                if(!$full && isset($trace['class']) && str_contains($trace['class'], 'LogLib'))
+                {
                     continue;
+                }
 
                 $results[] = new Backtrace($trace);
             }
@@ -36,34 +43,32 @@
         }
 
         /**
-         * Returns the current level type as a string
          *
-         * @param int $level
-         * @return string
          */
         public static function levelToString(int $level): string
         {
             return match ($level)
             {
-                LevelType::Debug => 'DBG',
-                LevelType::Verbose => 'VRB',
-                LevelType::Info => 'INF',
-                LevelType::Warning => 'WRN',
-                LevelType::Fatal => 'CRT',
-                LevelType::Error => 'ERR',
+                LevelType::DEBUG => 'DBG',
+                LevelType::VERBOSE => 'VRB',
+                LevelType::INFO => 'INF',
+                LevelType::WARNING => 'WRN',
+                LevelType::FATAL => 'CRT',
+                LevelType::ERROR => 'ERR',
                 default => 'UNK',
             };
         }
 
         /**
-         * A simple method to determine if the current environment is a CLI environment
+         * Determines whether the application is currently running in the command line interface (CLI) mode.
          *
-         * @return bool
+         * @return bool true if running in CLI mode, false otherwise.
          */
         public static function runningInCli(): bool
         {
             if(function_exists('php_sapi_name'))
             {
+                /** @noinspection ConstantCanBeUsedInspection */
                 return strtolower(php_sapi_name()) === 'cli';
             }
 
@@ -76,68 +81,74 @@
         }
 
         /**
-         * Attempts to determine the current log level from the command line arguments
+         * Returns the log level based on the configuration.
          *
-         * @return int
+         * @return int The log level. This value represents the severity or importance of the log messages.
+         *             The returned value will be one of the constants defined in the LevelType class:
+         *                 - DEBUG (6)
+         *                 - VERBOSE (5)
+         *                 - INFO (4)
+         *                 - WARNING (3)
+         *                 - ERROR (2)
+         *                 - FATAL (1)
+         *                 - SILENT (0)
+         *             If no log level is configured or the configured level is not recognized, the INFO level (4) will be returned by default.
          */
         public static function getLogLevel(): int
         {
             $args = Parse::getArguments();
 
-            $selected_level = ($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: null) ?? null);
-
-            if($selected_level === null)
-                return LevelType::Info;
-
-            switch(strtolower($selected_level))
+            switch(strtolower(($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: null) ?? null)))
             {
-                case LevelType::Debug:
+                case LevelType::DEBUG:
                 case 'debug':
                 case '6':
                 case 'dbg':
-                    return LevelType::Debug;
+                    return LevelType::DEBUG;
 
-                case LevelType::Verbose:
+                case LevelType::VERBOSE:
                 case 'verbose':
                 case '5':
                 case 'vrb':
-                    return LevelType::Verbose;
+                    return LevelType::VERBOSE;
 
                 default:
-                case LevelType::Info:
+                case LevelType::INFO:
                 case 'info':
                 case '4':
                 case 'inf':
-                    return LevelType::Info;
+                    return LevelType::INFO;
 
-                case LevelType::Warning:
+                case LevelType::WARNING:
                 case 'warning':
                 case '3':
                 case 'wrn':
-                    return LevelType::Warning;
+                    return LevelType::WARNING;
 
-                case LevelType::Error:
+                case LevelType::ERROR:
                 case 'error':
                 case '2':
                 case 'err':
-                    return LevelType::Error;
+                    return LevelType::ERROR;
 
-                case LevelType::Fatal:
+                case LevelType::FATAL:
                 case 'fatal':
                 case '1':
                 case 'crt':
-                    return LevelType::Fatal;
+                    return LevelType::FATAL;
 
-                case LevelType::Silent:
+                case LevelType::SILENT:
                 case 'silent':
                 case '0':
                 case 'sil':
-                    return LevelType::Silent;
+                    return LevelType::SILENT;
             }
         }
 
         /**
-         * @return bool
+         * Checks if ANSI escape sequences should be displayed in the output.
+         *
+         * @return bool Returns true if ANSI escape sequences should be displayed, false otherwise.
          */
         public static function getDisplayAnsi(): bool
         {
@@ -145,51 +156,30 @@
             $display_ansi = ($args['display-ansi'] ?? $args['ansi'] ?? null);
 
             if($display_ansi === null)
+            {
                 return true;
+            }
 
             // Strict boolean response
             return strtolower($display_ansi) === 'true' || $display_ansi === '1';
         }
 
         /**
-         * Returns the current active log file name, the current value can
-         * change depending on the date/time, if it has changed; close the
-         * old file and open a new one.
+         * Returns a string representation of the backtrace for the given event.
          *
-         * @return string
-         */
-        public static function getLogFilename(): string
-        {
-           return date('Y-m-d') . '.log';
-        }
-
-        /**
-         * Returns a random string of characters
-         *
-         * @param int $length
-         * @return string
-         */
-        public static function randomString(int $length = 32): string
-        {
-            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $charactersLength = strlen($characters);
-            $randomString = '';
-            for ($i = 0; $i < $length; $i++)
-            {
-                $randomString .= $characters[rand(0, $charactersLength - 1)];
-            }
-            return $randomString;
-        }
-
-        /**
-         * @param Event $event
-         * @param bool $ansi
-         * @return string|null
+         * @param Event $event The event object for which to generate the backtrace string.
+         * @param bool $ansi Determines whether the output should include ANSI escape codes for colored output. Default is false.
+         * @return string|null A string representation of the backtrace for the event, or null if the event has no backtrace.
+         *                    The output format is: ClassName::methodName() or functionName() depending on the type of call.
+         *                    If $ansi is true, the output will be colored using ANSI escape codes.
+         *                    If the event has no backtrace, the constant CallType::LAMBDA_CALL will be returned.
          */
         public static function getTraceString(Event $event, bool $ansi=false): ?string
         {
-            if($event->getBacktrace() == null)
-                return 'λ';
+            if($event->getBacktrace() === null)
+            {
+                return CallType::LAMBDA_CALL;
+            }
 
             $backtrace = $event->getBacktrace()[0];
             $function = $backtrace->getFunction();
@@ -201,18 +191,22 @@
                 $class = "\033[1;37m$class\033[0m";
             }
 
-            if($class == null)
-                return "{$function}()";
+            if($class === null)
+            {
+                return $function . CallType::FUNCTION_CALL;
+            }
 
-            $type = ($backtrace->getType() == '->' ? '->' : '::');
-            return "{$class}{$type}{$function}()";
+            $type = ($backtrace->getType() === CallType::METHOD_CALL ? CallType::METHOD_CALL : CallType::STATIC_CALL);
+            return "{$class}{$type}{$function}" . CallType::FUNCTION_CALL;
         }
 
         /**
-         * Returns an array representation of a throwable exception
+         * Converts an exception object to an array representation.
          *
-         * @param Throwable $e
-         * @return array
+         * @param Throwable $e The exception object to convert.
+         * @return array An array containing the details of the exception.
+         *               The array includes the exception message, code, file, line, and a formatted trace.
+         *               The trace is formatted as a string containing the file, line, class, type, and function for each call in the traceback.
          */
         public static function exceptionToArray(Throwable $e): array
         {

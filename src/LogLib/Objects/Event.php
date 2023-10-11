@@ -7,37 +7,76 @@
     use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Utilities;
     use Throwable;
+
     class Event
     {
         /**
-         * The level of the event
-         *
          * @see LevelType
          * @var string
-         * @property_name level
          */
-        public $Level;
+        private $level;
 
         /**
-         * An array of backtraces, if any, that were created when the event was created
-         *
          * @var Backtrace[]|null
          */
-        private $Backtrace;
+        private $backtrace;
 
         /**
-         * The exception that was thrown, if any
-         *
          * @var Throwable|null
          */
-        public $Exception;
+        private $exception;
 
         /**
-         * The message of the event
-         *
          * @var string
          */
-        public $Message;
+        private $message;
+
+        /**
+         * Event constructor.
+         *
+         * @param string $message
+         * @param int $level
+         * @param Throwable|null $exception
+         * @param array|null $backtrace
+         */
+        public function __construct(string $message, int $level, ?Throwable $exception=null, ?array $backtrace=null)
+        {
+            $this->message = $message;
+            $this->level = $level;
+            $this->exception = $exception;
+            $this->backtrace = $backtrace;
+        }
+
+        /**
+         * Returns the level of the event
+         *
+         * @see LevelType
+         * @return int
+         */
+        public function getLevel(): int
+        {
+            return $this->level;
+        }
+
+        /**
+         * Returns the message of the event
+         *
+         * @return string
+         */
+        public function getMessage(): string
+        {
+            return $this->message;
+        }
+
+        /**
+         * Optional. Returns the exception to the event
+         *
+         * @return Throwable|null
+         */
+        public function getException(): ?Throwable
+        {
+            return $this->exception;
+        }
 
         /**
          * Sets an exception to the event
@@ -47,23 +86,27 @@
          */
         public function setException(Throwable $e): void
         {
-            $this->Exception = Utilities::exceptionToArray($e);
+            $this->exception = Utilities::exceptionToArray($e);
         }
 
         /**
+         * Returns the backtrace of the event
+         *
          * @return array|null
          */
         public function getBacktrace(): ?array
         {
-            return $this->Backtrace;
+            return $this->backtrace;
         }
 
         /**
-         * @param array|null $Backtrace
+         * Sets the backtrace of the event
+         *
+         * @param array|null $backtrace
          */
-        public function setBacktrace(?array $Backtrace): void
+        public function setBacktrace(?array $backtrace): void
         {
-            $this->Backtrace = $Backtrace;
+            $this->backtrace = $backtrace;
         }
 
     }

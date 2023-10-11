@@ -2,53 +2,74 @@
 
     namespace LogLib\Abstracts;
 
-    abstract class ConsoleColors
+    final class ConsoleColors
     {
-        const Black = "0;30";
-        const DarkGray = "1;30";
-        const Blue = "0;34";
-        const LightBlue = "1;34";
-        const Green = "0;32";
-        const LightGreen = "1;32";
-        const Cyan = "0;36";
-        const LightCyan = "1;36";
-        const Red = "0;31";
-        const LightRed = "1;31";
-        const Purple = "0;35";
-        const LightPurple = "1;35";
-        const Brown = "0;33";
-        const Yellow = "1;33";
-        const LightGray = "0;37";
-        const White = "1;37";
-        const Reset = "0";
+        public const BLACK = "0;30";
 
-        const All = [
-            self::Black,
-            self::DarkGray,
-            self::Blue,
-            self::LightBlue,
-            self::Green,
-            self::LightGreen,
-            self::Cyan,
-            self::LightCyan,
-            self::Red,
-            self::LightRed,
-            self::Purple,
-            self::LightPurple,
-            self::Brown,
-            self::Yellow,
-            self::LightGray,
-            self::White
+        public const DARK_GRAY = "1;30";
+
+        public const BLUE = "0;34";
+
+        public const LIGHT_BLUE = "1;34";
+
+        public const GREEN = "0;32";
+
+        public const LIGHT_GREEN = "1;32";
+
+        public const CYAN = "0;36";
+
+        public const LIGHT_CYAN = "1;36";
+
+        public const RED = "0;31";
+
+        public const LIGHT_RED = "1;31";
+
+        public const PURPLE = "0;35";
+
+        public const LIGHT_PURPLE = "1;35";
+
+        public const BROWN = "0;33";
+
+        public const YELLOW = "1;33";
+
+        public const LIGHT_GRAY = "0;37";
+
+        public const WHITE = "1;37";
+
+        public const RESET = "0";
+
+        /**
+         * Represents an array of all possible supported color values.
+         *
+         * @var array
+         */
+        public const ALL = [
+            self::BLACK,
+            self::DARK_GRAY,
+            self::BLUE,
+            self::LIGHT_BLUE,
+            self::GREEN,
+            self::LIGHT_GREEN,
+            self::CYAN,
+            self::LIGHT_CYAN,
+            self::RED,
+            self::LIGHT_RED,
+            self::PURPLE,
+            self::LIGHT_PURPLE,
+            self::BROWN,
+            self::YELLOW,
+            self::LIGHT_GRAY,
+            self::WHITE
         ];
 
         /**
          * A list of random usable bright colors
          */
-        const BrightColors = [
-            self::LightBlue,
-            self::LightGreen,
-            self::LightCyan,
-            self::LightRed,
-            self::LightPurple,
+        public const BRIGHT_COLORS = [
+            self::LIGHT_BLUE,
+            self::LIGHT_GREEN,
+            self::LIGHT_CYAN,
+            self::LIGHT_RED,
+            self::LIGHT_PURPLE,
         ];
     }

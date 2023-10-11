@@ -8,19 +8,16 @@
     class Options
     {
         /**
-         * The name of the application
-         *
          * @var string
-         * @property_name application_name
          */
-        private $ApplicationName;
+        private $application_name;
 
         /**
          * Options constructor.
          */
         public function __construct(string $application_name)
         {
-            $this->ApplicationName = $application_name;
+            $this->application_name = $application_name;
         }
 
         /**
@@ -30,7 +27,7 @@
          */
         public function getApplicationName(): string
         {
-            return $this->ApplicationName;
+            return $this->application_name;
         }
 
     }

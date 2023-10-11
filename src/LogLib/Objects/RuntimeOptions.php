@@ -4,7 +4,6 @@
 
     namespace LogLib\Objects;
 
-    use InvalidArgumentException;
     use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Utilities;
 
@@ -16,7 +15,7 @@
          * @var bool
          * @property_name console_output
          */
-        private $ConsoleOutput;
+        private $console_output;
 
         /**
          * Indicates if ANSI colors should be used in the console output
@@ -24,7 +23,7 @@
          * @var bool
          * @property_name display_ansi
          */
-        private $DisplayAnsi;
+        private $display_ansi;
 
         /**
          * Indicates if LogLib should handle uncaught exceptions
@@ -32,7 +31,7 @@
          * @var bool
          * @property_name handle_exceptions
          */
-        private $HandleExceptions;
+        private $handle_exceptions;
 
         /**
          * The current log level
@@ -40,17 +39,17 @@
          * @var int
          * @see LevelType
          */
-        private $LogLevel;
+        private $log_level;
 
         /**
          * Public Constructor
          */
         public function __construct()
         {
-            $this->ConsoleOutput = Utilities::runningInCli();
-            $this->DisplayAnsi = Utilities::getDisplayAnsi();
-            $this->HandleExceptions = true;
-            $this->LogLevel = Utilities::getLogLevel();
+            $this->console_output = Utilities::runningInCli();
+            $this->display_ansi = Utilities::getDisplayAnsi();
+            $this->log_level = Utilities::getLogLevel();
+            $this->handle_exceptions = true;
         }
 
         /**
@@ -58,62 +57,62 @@
          */
         public function isConsoleOutput(): bool
         {
-            return $this->ConsoleOutput;
+            return $this->console_output;
         }
 
         /**
-         * @param bool $ConsoleOutput
+         * @param bool $console_output
          */
-        public function setConsoleOutput(bool $ConsoleOutput): void
+        public function setConsoleOutput(bool $console_output): void
         {
-            $this->ConsoleOutput = $ConsoleOutput;
-        }
-
-        /**
-         * @return bool
-         */
-        public function isDisplayAnsi(): bool
-        {
-            return $this->DisplayAnsi;
-        }
-
-        /**
-         * @param bool $DisplayAnsi
-         */
-        public function setDisplayAnsi(bool $DisplayAnsi): void
-        {
-            $this->DisplayAnsi = $DisplayAnsi;
+            $this->console_output = $console_output;
         }
 
         /**
          * @return bool
          */
-        public function isHandleExceptions(): bool
+        public function displayAnsi(): bool
         {
-            return $this->HandleExceptions;
+            return $this->display_ansi;
         }
 
         /**
-         * @param bool $HandleExceptions
+         * @param bool $display_ansi
          */
-        public function setHandleExceptions(bool $HandleExceptions): void
+        public function setDisplayAnsi(bool $display_ansi): void
         {
-            $this->HandleExceptions = $HandleExceptions;
+            $this->display_ansi = $display_ansi;
+        }
+
+        /**
+         * @return bool
+         */
+        public function handleExceptions(): bool
+        {
+            return $this->handle_exceptions;
+        }
+
+        /**
+         * @param bool $handle_exceptions
+         */
+        public function setHandleExceptions(bool $handle_exceptions): void
+        {
+            $this->handle_exceptions = $handle_exceptions;
         }
 
         /**
          * @return int
          */
-        public function getLogLevel(): int
+        public function getLoglevel(): int
         {
-            return $this->LogLevel;
+            return $this->log_level;
         }
 
         /**
-         * @param int $LogLevel
+         * @param int $log_level
          */
-        public function setLogLevel(int $LogLevel): void
+        public function setLoglevel(int $log_level): void
         {
-            $this->LogLevel = $LogLevel;
+            $this->log_level = $log_level;
         }
     }

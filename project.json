@@ -31,7 +31,6 @@
             {
                 "name": "net.nosial.optslib",
                 "version": "latest",
-                "source_type": "remote",
                 "source": "nosial/libs.opts=latest@n64"
             }
         ],
@@ -39,10 +38,15 @@
             {
                 "name": "release",
                 "build_type": "ncc",
+                "output": "build/release/%ASSEMBLY.PACKAGE%.ncc"
+            },
+            {
+                "name": "release_static",
+                "build_type": "ncc",
                 "options": {
-                    "compression": "high"
+                    "static": true
                 },
-                "output_path": "build/release"
+                "output": "build/release/%ASSEMBLY.PACKAGE%_static.ncc"
             }
         ]
     }

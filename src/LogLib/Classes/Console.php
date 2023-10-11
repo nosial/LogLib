@@ -4,11 +4,13 @@
 
     namespace LogLib\Classes;
 
+    use Exception;
     use LogLib\Abstracts\ConsoleColors;
     use LogLib\Abstracts\LevelType;
     use LogLib\Log;
     use LogLib\Objects\Event;
     use LogLib\Objects\Options;
+    use RuntimeException;
     use Throwable;
 
     class Console
@@ -20,30 +22,42 @@
 
 
         /**
-         * @var float|int
+         * @var float|int|null
          */
         private static $last_tick_time;
 
         /**
-         * @var int
+         * @var int|null
          */
         private static $largest_tick_length;
 
         /**
-         * Formats the application color for the console
+         * Formats the application name with a color for the console
          *
-         * @param string $application
-         * @return string
+         * @param string $application The application name
+         * @return string The formatted application name
+         * @throws RuntimeException If unable to generate a random color for the application
          */
         private static function formatAppColor(string $application): string
         {
-            if(!Log::getRuntimeOptions()->isDisplayAnsi())
+            if(!Log::getRuntimeOptions()->displayAnsi())
+            {
                 return $application;
+            }
 
             if(!isset(self::$application_colors[$application]))
             {
-                $colors = ConsoleColors::BrightColors;
-                $color = $colors[array_rand($colors)];
+                $colors = ConsoleColors::BRIGHT_COLORS;
+
+                try
+                {
+                    $color = $colors[random_int(0, count($colors) - 1)];
+                }
+                catch (Exception $e)
+                {
+                    throw new RuntimeException(sprintf('Unable to generate random color for application "%s"', $application), $e->getCode(), $e);
+                }
+
                 self::$application_colors[$application] = $color;
             }
 
@@ -51,79 +65,72 @@
         }
 
         /**
-         * Returns a color formatted string for the console
+         * Applies a specified color to the given text, using ANSI escape sequences.
          *
-         * @param string $text
-         * @param string $color
-         * @return string
+         * @param string $text The text to apply the color to.
+         * @param string $color The ANSI color code to apply to the text.
+         * @return string The text with the specified color applied.
          */
         private static function color(string $text, string $color): string
         {
-            if(!Log::getRuntimeOptions()->isDisplayAnsi())
+            if(!Log::getRuntimeOptions()->displayAnsi())
+            {
                 return $text;
+            }
 
             return "\033[" . $color . "m" . $text . "\033[0m";
         }
 
         /**
-         * Colorizes a event string for the console
+         * Applies a specified color to the given text, based on the event level, using ANSI escape sequences.
          *
-         * @param Event $event
-         * @param string $text
-         * @return string
+         * @param Event $event The event object.
+         * @param string $text The text to apply the color to.
+         * @return string The text with the specified color applied.
          */
         private static function colorize(Event $event, string $text): string
         {
-            if(!Log::getRuntimeOptions()->isDisplayAnsi())
-                return Utilities::levelToString($text);
-
-            $color = null;
-            switch($event->Level)
+            if(!Log::getRuntimeOptions()->displayAnsi())
             {
-                case LevelType::Debug:
-                    $color = ConsoleColors::LightPurple;
-                    break;
-                case LevelType::Verbose:
-                    $color = ConsoleColors::LightCyan;
-                    break;
-                case LevelType::Info:
-                    $color = ConsoleColors::White;
-                    break;
-                case LevelType::Warning:
-                    $color = ConsoleColors::Yellow;
-                    break;
-                case LevelType::Fatal:
-                    $color = ConsoleColors::Red;
-                    break;
-                case LevelType::Error:
-                    $color = ConsoleColors::LightRed;
-                    break;
+                return Utilities::levelToString($text);
             }
 
-            if($color == null)
+            $color = match($event->getLevel())
+            {
+                LevelType::DEBUG => ConsoleColors::LIGHT_PURPLE,
+                LevelType::VERBOSE => ConsoleColors::LIGHT_CYAN,
+                LevelType::INFO => ConsoleColors::WHITE,
+                LevelType::WARNING => ConsoleColors::YELLOW,
+                LevelType::FATAL => ConsoleColors::RED,
+                LevelType::ERROR => ConsoleColors::LIGHT_RED,
+                default => null,
+            };
+
+            if($color === null)
+            {
                 return Utilities::levelToString($text);
+            }
 
             return self::color(Utilities::levelToString($text), $color);
         }
 
         /**
-         * Returns the current timestamp tick
+         * Retrieves the current timestamp as a formatted string.
          *
-         * @return string
+         * @return string The current timestamp.
          */
         private static function getTimestamp(): string
         {
             $tick_time = (string)microtime(true);
 
-            if(strlen($tick_time) > self::$largest_tick_length)
+            if(!is_null(self::$largest_tick_length) && strlen($tick_time) > (int)self::$largest_tick_length)
             {
                 self::$largest_tick_length = strlen($tick_time);
             }
 
             if(strlen($tick_time) < self::$largest_tick_length)
             {
-                /** @noinspection PhpRedundantOptionalArgumentInspection */
-                $tick_time = str_pad($tick_time, (strlen($tick_time) + (self::$largest_tick_length - strlen($tick_time))), ' ', STR_PAD_RIGHT);
+                $tick_time = str_pad($tick_time, (strlen($tick_time) + (self::$largest_tick_length - strlen($tick_time))));
             }
 
             $fmt_tick = $tick_time;
@@ -133,11 +140,11 @@
 
                 if ($timeDiff > 1.0)
                 {
-                    $fmt_tick = \ncc\Utilities\Console::formatColor($tick_time, \ncc\Abstracts\ConsoleColors::LightRed);
+                    $fmt_tick = self::color($tick_time, ConsoleColors::LIGHT_RED);
                 }
                 elseif ($timeDiff > 0.5)
                 {
-                    $fmt_tick = self::color($tick_time, ConsoleColors::Yellow);
+                    $fmt_tick = self::color($tick_time, ConsoleColors::YELLOW);
                 }
             }
 
@@ -146,54 +153,58 @@
         }
 
         /**
-         * Regular console output for the event object
+         * Outputs a log event to the console.
          *
-         * @param Options $options
-         * @param Event $event
+         * @param Options $options The options configuration object.
+         * @param Event $event The log event to output.
          * @return void
          */
         public static function out(Options $options, Event $event): void
         {
             if(!Utilities::runningInCli())
-                return;
-
-            if(Validate::checkLevelType(LevelType::Verbose, Log::getRuntimeOptions()->getLogLevel()))
             {
-                $backtrace_output = Utilities::getTraceString($event, Log::getRuntimeOptions()->isDisplayAnsi());
+                return;
+            }
 
-                print(sprintf(
-                    "[%s] [%s] [%s] %s %s" . PHP_EOL,
+            if(Validate::checkLevelType(LevelType::VERBOSE, Log::getRuntimeOptions()->getLoglevel()))
+            {
+                $backtrace_output = Utilities::getTraceString($event, Log::getRuntimeOptions()->displayAnsi());
+
+                print(sprintf("[%s] [%s] [%s] %s %s" . PHP_EOL,
                     self::getTimestamp(),
                     self::formatAppColor($options->getApplicationName()),
-                    self::colorize($event, $event->Level),
-                    $backtrace_output, $event->Message
+                    self::colorize($event, $event->getLevel()),
+                    $backtrace_output, $event->getMessage()
                 ));
 
-                if($event->Exception !== null)
-                    self::outException($event->Exception);
+                if($event->getException() !== null)
+                {
+                    /** @noinspection NullPointerExceptionInspection */
+                    self::outException($event->getException());
+                }
 
                 return;
             }
 
-            print(sprintf(
-                "[%s] [%s] [%s] %s" . PHP_EOL,
+            print(sprintf("[%s] [%s] [%s] %s" . PHP_EOL,
                 self::getTimestamp(),
                 self::formatAppColor($options->getApplicationName()),
-                self::colorize($event, $event->Level),
-                $event->Message
+                self::colorize($event, $event->getLevel()),
+                $event->getMessage()
             ));
         }
 
         /**
-         * Prints out the exception details
+         * Prints information about the given exception, including the error message, error code,
+         * and stack trace.
          *
-         * @param Throwable $exception
+         * @param Throwable $exception The exception to print information about.
          * @return void
          */
         private static function outException(Throwable $exception): void
         {
-            $trace_header = self::color($exception->getFile() . ':' . $exception->getLine(), ConsoleColors::Purple);
-            $trace_error = self::color('error: ', ConsoleColors::Red);
+            $trace_header = self::color($exception->getFile() . ':' . $exception->getLine(), ConsoleColors::PURPLE);
+            $trace_error = self::color('error: ', ConsoleColors::RED);
 
             print($trace_header . ' ' . $trace_error . $exception->getMessage() . PHP_EOL);
             print(sprintf('Error code: %s', $exception->getCode()) . PHP_EOL);
@@ -204,13 +215,15 @@
                 print('Stack Trace:' . PHP_EOL);
                 foreach($trace as $item)
                 {
-                    print( ' - ' . self::color($item['file'], ConsoleColors::Red) . ':' . $item['line'] . PHP_EOL);
+                    print( ' - ' . self::color($item['file'], ConsoleColors::RED) . ':' . $item['line'] . PHP_EOL);
                 }
             }
 
             if($exception->getPrevious() !== null)
             {
                 print('Previous Exception:' . PHP_EOL);
+
+                /** @noinspection NullPointerExceptionInspection */
                 self::outException($exception->getPrevious());
             }
         }

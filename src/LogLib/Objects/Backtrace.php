@@ -7,56 +7,35 @@
     class Backtrace
     {
         /**
-         * The function name of the backtrace
-         *
          * @var string|null
-         * @property_name function
          */
-        private $Function;
+        private $function;
 
         /**
-         * The line number of the backtrace
-         *
          * @var int|null
-         * @property_name line
          */
-        private $Line;
+        private $line;
 
         /**
-         * The file name of the backtrace
-         *
          * @var string|null
-         * @property_name file
          */
-        private $File;
+        private $file;
 
         /**
-         * The class name, if any, of the backtrace
-         *
          * @var string|null
-         * @property_name class
          */
-        private $Class;
+        private $class;
 
         /**
-         * The current call type. If a method call, "->" is returned.
-         * If a static method call, "::" is returned. If a function call,
-         * nothing is returned.
-         *
          * @see CallType
          * @var string|null
-         * @property_name type
          */
-        private $Type;
+        private $type;
 
         /**
-         * If inside a function, this lists the functions arguments. If inside
-         * an included file, this lists the included file name(s).
-         *
          * @var array|null
-         * @property_name args
          */
-        private $Args;
+        private $args;
 
         /**
          * Public Constructor
@@ -66,109 +45,135 @@
         public function __construct(?array $backtrace=null)
         {
             if($backtrace === null)
+            {
                 return;
+            }
 
-            $this->Function = $backtrace['function'] ?? null;
-            $this->Line = $backtrace['line'] ?? null;
-            $this->File = $backtrace['file'] ?? null;
-            $this->Class = $backtrace['class'] ?? null;
-            $this->Type = $backtrace['type'] ?? null;
-            $this->Args = $backtrace['args'] ?? null;
+            $this->function = $backtrace['function'] ?? null;
+            $this->line = $backtrace['line'] ?? null;
+            $this->file = $backtrace['file'] ?? null;
+            $this->class = $backtrace['class'] ?? null;
+            $this->type = $backtrace['type'] ?? null;
+            $this->args = $backtrace['args'] ?? null;
         }
 
         /**
+         * Optional. Returns the function name of the backtrace
+         *
          * @return string|null
          */
         public function getFunction(): ?string
         {
-            return $this->Function;
+            return $this->function;
         }
 
         /**
-         * @param string|null $Function
+         * Sets the function name of the backtrace
+         *
+         * @param string|null $function
          */
-        public function setFunction(?string $Function): void
+        public function setFunction(?string $function): void
         {
-            $this->Function = $Function;
+            $this->function = $function;
         }
 
         /**
+         * Optional. Returns the line number of the backtrace
+         *
          * @return int|null
          */
         public function getLine(): ?int
         {
-            return $this->Line;
+            return $this->line;
         }
 
         /**
-         * @param int|null $Line
+         * Sets the line number of the backtrace
+         *
+         * @param int|null $line
          */
-        public function setLine(?int $Line): void
+        public function setLine(?int $line): void
         {
-            $this->Line = $Line;
+            $this->line = $line;
         }
 
         /**
+         * Optional. Returns the file name of the backtrace
+         *
          * @return string|null
          */
         public function getFile(): ?string
         {
-            return $this->File;
+            return $this->file;
         }
 
         /**
-         * @param string|null $File
+         * Sets the file name of the backtrace
+         *
+         * @param string|null $file
          */
-        public function setFile(?string $File): void
+        public function setFile(?string $file): void
         {
-            $this->File = $File;
+            $this->file = $file;
         }
 
         /**
+         * Optional. Returns the class name, if any, of the backtrace
+         *
          * @return string|null
          */
         public function getClass(): ?string
         {
-            return $this->Class;
+            return $this->class;
         }
 
         /**
-         * @param string|null $Class
+         * Sets the class name, if any, of the backtrace
+         *
+         * @param string|null $class
          */
-        public function setClass(?string $Class): void
+        public function setClass(?string $class): void
         {
-            $this->Class = $Class;
+            $this->class = $class;
         }
 
         /**
+         * Optional. Returns the current call type. If a method call, "->" is returned.
+         *
          * @return string|null
          */
         public function getType(): ?string
         {
-            return $this->Type;
+            return $this->type;
         }
 
         /**
-         * @param string|null $Type
+         * Sets the current call type. If a method call, "->" is returned.
+         *
+         * @param string|null $type
          */
-        public function setType(?string $Type): void
+        public function setType(?string $type): void
         {
-            $this->Type = $Type;
+            $this->type = $type;
         }
 
         /**
+         * Optional. Return the functions arguments or included file name(s)
+         *
          * @return array|null
          */
         public function getArgs(): ?array
         {
-            return $this->Args;
+            return $this->args;
         }
 
         /**
-         * @param array|null $Args
+         * Sets the function arguments or included file name(s)
+         *
+         * @param array|null $args
          */
-        public function setArgs(?array $Args): void
+        public function setArgs(?array $args): void
         {
-            $this->Args = $Args;
+            $this->args = $args;
         }
     }
