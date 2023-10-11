@@ -13,8 +13,7 @@
                 "host": "git.n64.cc",
                 "ssl": true
             }
-        },
-        "options": []
+        }
     },
     "assembly": {
         "name": "LogLib",
