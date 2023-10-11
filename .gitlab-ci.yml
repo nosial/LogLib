@@ -8,14 +8,10 @@ stages:
 variables:
     PACKAGE_NAME: $CI_COMMIT_REF_NAME
 
-prepare:
-    stage: prepare
-    script:
-        - ncc project install
-
 build:
     stage: build
     script:
+        - ncc project install
         - ncc build --config release --log-level debug -o "build/release/net.nosial.loglib.ncc"
     artifacts:
         paths:
@@ -24,6 +20,7 @@ build:
 build_static:
     stage: build
     script:
+        - ncc project install
         - ncc build --config release_static --log-level debug -o "build/release/net.nosial.loglib_static.ncc"
     artifacts:
         paths:
