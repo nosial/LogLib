@@ -1,7 +1,6 @@
 # LogLib
 
-A logging library for PHP/ncc, this was quickly thrown together
-to provide a simple logging interface and to test out 
+A logging library for PHP/ncc, this was quickly thrown together to provide a simple logging interface and to test out 
 NCC's capabilities for PHP.
 
 ## Table of Contents
@@ -25,8 +24,7 @@ The library can be installed using ncc:
 ncc install -p "nosial/libs.log=latest@n64"
 ```
 
-or by adding the following to your project.json file under
-the `build.dependencies` section:
+or by adding the following to your project.json file under the `build.dependencies` section:
 
 ```json
 {
@@ -36,8 +34,7 @@ the `build.dependencies` section:
 }
 ```
 
-If you don't have the n64 source configured you can add it
-by running the following command:
+If you don't have the n64 source configured you can add it by running the following command:
 
 ```bash
 ncc source add --name n64 --type gitlab --host git.n64.cc
@@ -60,8 +57,7 @@ make release
 
 ## Usage
 
-The usage of this library is very simple, there are
-multiple error levels that can be used to log messages
+The usage of this library is very simple, there are multiple error levels that can be used to log messages
 
 ```php
 <?php
@@ -78,10 +74,8 @@ multiple error levels that can be used to log messages
 
 ```
 
-To display the log messages, you can run your program
-with the `--log-level` argument, this will display all
-messages with a level equal to or higher than the one
-specified.
+To display the log messages, you can run your program with the `--log-level` argument, this will display all messages
+with a level equal to or higher than the one specified.
 
 ```bash
 myprogram --log-level info
@@ -99,9 +93,8 @@ The log level can be set to one of the following:
 
 The default log level is `info`.
 
- > Note: Log messages are only displayed if the program
-is run from the command line, if you are running the
-program from a web server, the log messages will be shown
+ > Note: Log messages are only displayed if the program is run from the command line, if you are running the program
+ > from a web server, the log messages will be shown
  
 
 ## Changelog
