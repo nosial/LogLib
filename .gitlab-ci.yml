@@ -1,7 +1,6 @@
 image: repo.n64.cc:443/nosial/ncc:latest
 
 stages:
-    - prepare
     - build
     - publish
 
