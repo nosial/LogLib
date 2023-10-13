@@ -24,6 +24,13 @@ The library can be installed using ncc:
 ncc install -p "nosial/libs.log=latest@n64"
 ```
 
+A static version of the library can be installed using ncc, the `--skip-dependencies` flag is option but prevents
+additional dependencies from being installed.
+
+```bash
+ncc install -p "nosial/libs.log=latest@n64" --static --skip-dependencies
+```
+
 or by adding the following to your project.json file under the `build.dependencies` section:
 
 ```json
