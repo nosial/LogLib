@@ -12,12 +12,12 @@
     {
         /**
          * @see LevelType
-         * @var string
+         * @var int
          */
         private $level;
 
         /**
-         * @var Backtrace[]|null
+         * @var array|null
          */
         private $backtrace;
 

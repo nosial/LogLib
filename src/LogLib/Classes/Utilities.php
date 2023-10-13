@@ -4,7 +4,6 @@
 
     use LogLib\Abstracts\CallType;
     use LogLib\Abstracts\LevelType;
-    use LogLib\Objects\Backtrace;
     use LogLib\Objects\Event;
     use OptsLib\Parse;
     use Throwable;
@@ -14,36 +13,23 @@
         /**
          * Returns a backtrace of the calling code.
          *
-         * @param bool $full Determines whether the full backtrace should be returned or not. Default is false.
          * @return array An array containing backtrace information.
-         *                Each element in the array represents a single call in the call stack and is an instance of the Backtrace class.
-         *                If the debug_backtrace () function is not available, an empty array will be returned.
          */
-        public static function getBacktrace(bool $full=false): array
+        public static function getBacktrace(): array
         {
             if(!function_exists('debug_backtrace'))
             {
                 return [];
             }
 
-            $backtrace = debug_backtrace();
-            $results = [];
-
-            foreach($backtrace as $trace)
-            {
-                if(!$full && isset($trace['class']) && str_contains($trace['class'], 'LogLib'))
-                {
-                    continue;
-                }
-
-                $results[] = new Backtrace($trace);
-            }
-
-            return $results;
+            return debug_backtrace();
         }
 
         /**
+         * Converts a log level to its corresponding string representation.
          *
+         * @param int $level The log level to convert.
+         * @return string The string representation of the log level.
          */
         public static function levelToString(int $level): string
         {
@@ -176,19 +162,58 @@
          */
         public static function getTraceString(Event $event, bool $ansi=false): ?string
         {
-            if($event->getBacktrace() === null)
+            if($event->getBacktrace() === null || count($event->getBacktrace()) === 0)
             {
                 return CallType::LAMBDA_CALL;
             }
 
-            $backtrace = $event->getBacktrace()[0];
-            $function = $backtrace->getFunction();
-            $class = $backtrace->getClass();
+            $backtrace = $event->getBacktrace()[count($event->getBacktrace()) - 1];
+
+            // Ignore \LogLib namespace
+            if(isset($backtrace['class']) && str_starts_with($backtrace['class'], 'LogLib'))
+            {
+                if(isset($backtrace['file']))
+                {
+                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '');
+                }
+
+                return basename($backtrace['file']);
+            }
+
+            if($backtrace['function'] === '{closure}')
+            {
+                if(isset($backtrace['file']))
+                {
+                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '') . CallType::STATIC_CALL . CallType::LAMBDA_CALL;
+                }
+
+                return basename($backtrace['file']) . CallType::STATIC_CALL . CallType::LAMBDA_CALL;
+            }
+
+            if($backtrace['function'] === 'eval')
+            {
+                if(isset($backtrace['file']))
+                {
+                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '') . CallType::STATIC_CALL . CallType::EVAL_CALL;
+                }
+
+                return basename($backtrace['file']) . CallType::STATIC_CALL . CallType::EVAL_CALL;
+            }
 
             if($ansi)
             {
-                $function = "\033[1;37m$function\033[0m";
-                $class = "\033[1;37m$class\033[0m";
+                $function = sprintf("\033[1;37m%s\033[0m", $backtrace['function']);
+                $class = null;
+
+                if(isset($backtrace["class"]))
+                {
+                    $class = sprintf("\033[1;37m%s\033[0m", $backtrace['class']);
+                }
+            }
+            else
+            {
+                $function = $backtrace['function'];
+                $class = $backtrace['class'] ?? null;
             }
 
             if($class === null)
@@ -196,9 +221,10 @@
                 return $function . CallType::FUNCTION_CALL;
             }
 
-            $type = ($backtrace->getType() === CallType::METHOD_CALL ? CallType::METHOD_CALL : CallType::STATIC_CALL);
+            $type = ($backtrace['type'] === CallType::METHOD_CALL ? CallType::METHOD_CALL : CallType::STATIC_CALL);
             return "{$class}{$type}{$function}" . CallType::FUNCTION_CALL;
         }
+
 
         /**
          * Converts an exception object to an array representation.

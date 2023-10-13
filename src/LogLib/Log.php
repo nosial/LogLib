@@ -110,13 +110,13 @@
          * Logs a message with a specified application name, level, optional message, and optional throwable.
          *
          * @param string $application_name The name of the application
-         * @param string $level The level type of the log (default is LevelType::INFO)
+         * @param int $level The level type of the log (default is LevelType::INFO)
          * @param string|null $message The message of the log event
          * @param Throwable|null $throwable The exception that was thrown, if any
          * @return void
          * @throws InvalidArgumentException If the provided level type is invalid or a message is null
          */
-        private static function log(string $application_name, string $level=LevelType::INFO, ?string $message=null, ?Throwable $throwable=null): void
+        private static function log(string $application_name, int $level=LevelType::INFO, ?string $message=null, ?Throwable $throwable=null): void
         {
             $application = self::getOptions($application_name);
 

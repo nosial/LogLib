@@ -82,17 +82,16 @@
         }
 
         /**
-         * Applies a specified color to the given text, based on the event level, using ANSI escape sequences.
+         * Colorizes the log message based on the event level using ANSI escape sequences.
          *
-         * @param Event $event The event object.
-         * @param string $text The text to apply the color to.
-         * @return string The text with the specified color applied.
+         * @param Event $event The log event to colorize.
+         * @return string The colorized log message.
          */
-        private static function colorize(Event $event, string $text): string
+        private static function colorize(Event $event): string
         {
             if(!Log::getRuntimeOptions()->displayAnsi())
             {
-                return Utilities::levelToString($text);
+                return Utilities::levelToString($event->getLevel());
             }
 
             $color = match($event->getLevel())
@@ -108,10 +107,10 @@
 
             if($color === null)
             {
-                return Utilities::levelToString($text);
+                return Utilities::levelToString($event->getLevel());
             }
 
-            return self::color(Utilities::levelToString($text), $color);
+            return self::color(Utilities::levelToString($event->getLevel()), $color);
         }
 
         /**
@@ -166,30 +165,46 @@
                 return;
             }
 
-            if(Validate::checkLevelType(LevelType::VERBOSE, Log::getRuntimeOptions()->getLoglevel()))
+            if(Validate::checkLevelType(LevelType::DEBUG, Log::getRuntimeOptions()->getLoglevel()))
             {
                 $backtrace_output = Utilities::getTraceString($event, Log::getRuntimeOptions()->displayAnsi());
 
                 print(sprintf("[%s] [%s] [%s] %s %s" . PHP_EOL,
                     self::getTimestamp(),
                     self::formatAppColor($options->getApplicationName()),
-                    self::colorize($event, $event->getLevel()),
+                    self::colorize($event),
                     $backtrace_output, $event->getMessage()
                 ));
 
                 if($event->getException() !== null)
                 {
-                    /** @noinspection NullPointerExceptionInspection */
                     self::outException($event->getException());
                 }
 
                 return;
             }
 
-            print(sprintf("[%s] [%s] [%s] %s" . PHP_EOL,
-                self::getTimestamp(),
+            if(Validate::checkLevelType(LevelType::VERBOSE, Log::getRuntimeOptions()->getLoglevel()))
+            {
+                $backtrace_output = Utilities::getTraceString($event, Log::getRuntimeOptions()->displayAnsi());
+
+                print(sprintf("[%s] [%s] %s %s" . PHP_EOL,
+                    self::formatAppColor($options->getApplicationName()),
+                    self::colorize($event),
+                    $backtrace_output, $event->getMessage()
+                ));
+
+                if($event->getException() !== null)
+                {
+                    self::outException($event->getException());
+                }
+
+                return;
+            }
+
+            print(sprintf("[%s] [%s] %s" . PHP_EOL,
                 self::formatAppColor($options->getApplicationName()),
-                self::colorize($event, $event->getLevel()),
+                self::colorize($event),
                 $event->getMessage()
             ));
         }
@@ -198,11 +213,16 @@
          * Prints information about the given exception, including the error message, error code,
          * and stack trace.
          *
-         * @param Throwable $exception The exception to print information about.
+         * @param Throwable|null $exception The exception to print information about.
          * @return void
          */
-        private static function outException(Throwable $exception): void
+        private static function outException(?Throwable $exception=null): void
         {
+            if($exception === null)
+            {
+                return;
+            }
+
             $trace_header = self::color($exception->getFile() . ':' . $exception->getLine(), ConsoleColors::PURPLE);
             $trace_error = self::color('error: ', ConsoleColors::RED);
 
@@ -223,7 +243,6 @@
             {
                 print('Previous Exception:' . PHP_EOL);
 
-                /** @noinspection NullPointerExceptionInspection */
                 self::outException($exception->getPrevious());
             }
         }

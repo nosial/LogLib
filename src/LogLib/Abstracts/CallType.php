@@ -31,4 +31,11 @@
          * @var string LAMBDA_CALL
          */
         public const LAMBDA_CALL = 'λ';
+
+        /**
+         * Represents an eval() call.
+         *
+         * @var string EVAL_CALL
+         */
+        public const EVAL_CALL = 'eval()';
     }
