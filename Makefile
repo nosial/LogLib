@@ -1,37 +1,37 @@
 # Variables
-NCC = ncc
-PACKAGE_NAME = net.nosial.loglib.ncc
-BUILD_CONFIG = release
-BUILD_STATIC_CONFIG = release_static
+DEFAULT_CONFIGURATION ?= release
+LOG_LEVEL = debug
 
-# Directories
-SRC_DIR = src
-BUILD_DIR = build
-RELEASE_BUILD_DIR = $(BUILD_DIR)/$(BUILD_CONFIG)
-RELEASE_STATIC_BUILD_DIR = $(BUILD_DIR)/$(BUILD_STATIC_CONFIG)
+# Default Target
+all: release release_static release-compressed debug-compressed release-executable release_static-executable release-compressed-executable debug-compressed-executable
 
-.PHONY: all release release_static install uninstall clean
+# Build Steps
+release:
+	ncc build --config=release --log-level $(LOG_LEVEL)
+release_static:
+	ncc build --config=release_static --log-level $(LOG_LEVEL)
+release-compressed:
+	ncc build --config=release-compressed --log-level $(LOG_LEVEL)
+debug-compressed:
+	ncc build --config=debug-compressed --log-level $(LOG_LEVEL)
+release-executable:
+	ncc build --config=release-executable --log-level $(LOG_LEVEL)
+release_static-executable:
+	ncc build --config=release_static-executable --log-level $(LOG_LEVEL)
+release-compressed-executable:
+	ncc build --config=release-compressed-executable --log-level $(LOG_LEVEL)
+debug-compressed-executable:
+	ncc build --config=debug-compressed-executable --log-level $(LOG_LEVEL)
 
-all: release release_static install
 
-release: prepare_build
-	$(NCC) build --config=$(BUILD_CONFIG) --out-dir=$(RELEASE_BUILD_DIR)
+install: release
+	ncc package install --package=build/release/net.nosial.loglib.ncc --skip-dependencies --build-source --reinstall -y --log-level $(LOG_LEVEL)
 
-release_static: prepare_build_static
-	$(NCC) build --config=$(BUILD_STATIC_CONFIG) --out-dir=$(RELEASE_STATIC_BUILD_DIR)
-
-install: prepare_build
-	$(NCC) package install --package="$(RELEASE_BUILD_DIR)/$(PACKAGE_NAME)" --skip-dependencies -y
-
-uninstall:
-	$(NCC) package uninstall -y --package="$(PACKAGE_NAME)"
+test: release
+	[ -f phpunit.xml ] || { echo "phpunit.xml not found"; exit 1; }
+	phpunit
 
 clean:
-	rm -rf $(RELEASE_BUILD_DIR)
-	rm -rf $(RELEASE_STATIC_BUILD_DIR)
+	rm -rf build
 
-prepare_build:
-	mkdir -p $(RELEASE_BUILD_DIR)
-
-prepare_build_static:
-	mkdir -p $(RELEASE_STATIC_BUILD_DIR)
+.PHONY: all install test clean release release_static release-compressed debug-compressed release-executable release_static-executable release-compressed-executable debug-compressed-executable

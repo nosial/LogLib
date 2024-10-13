@@ -42,10 +42,61 @@
             {
                 "name": "release_static",
                 "build_type": "ncc",
+                "output": "build/release/%ASSEMBLY.PACKAGE%_static.ncc",
                 "options": {
                     "static": true
+                }
+            },
+            {
+                "name": "release-compressed",
+                "build_type": "ncc",
+                "output": "build/release/%ASSEMBLY.PACKAGE%.gz.ncc",
+                "options": {
+                    "compression": "high"
+                }
+            },
+            {
+                "name": "debug-compressed",
+                "build_type": "ncc",
+                "output": "build/debug/%ASSEMBLY.PACKAGE%.gz.ncc",
+                "options": {
+                    "compression": "high"
                 },
-                "output": "build/release/%ASSEMBLY.PACKAGE%_static.ncc"
+                "define_constants": {
+                    "DEBUG": "1"
+                }
+            },
+            {
+                "name": "release-executable",
+                "build_type": "executable",
+                "output": "build/release/release_executable_gz",
+                "options": {
+                    "ncc_configuration": "release"
+                }
+            },
+            {
+                "name": "release_static-executable",
+                "build_type": "executable",
+                "output": "build/release/release_static_executable_gz",
+                "options": {
+                    "ncc_configuration": "release_static"
+                }
+            },
+            {
+                "name": "release-compressed-executable",
+                "build_type": "executable",
+                "output": "build/release/release_compressed_executable",
+                "options": {
+                    "ncc_configuration": "release-compressed"
+                }
+            },
+            {
+                "name": "debug-compressed-executable",
+                "build_type": "executable",
+                "output": "build/debug/debug_compressed_executable",
+                "options": {
+                    "ncc_configuration": "debug-compressed"
+                }
             }
         ]
     }
