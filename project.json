@@ -40,14 +40,6 @@
                 "output": "build/release/%ASSEMBLY.PACKAGE%.ncc"
             },
             {
-                "name": "release_static",
-                "build_type": "ncc",
-                "output": "build/release/%ASSEMBLY.PACKAGE%_static.ncc",
-                "options": {
-                    "static": true
-                }
-            },
-            {
                 "name": "release-compressed",
                 "build_type": "ncc",
                 "output": "build/release/%ASSEMBLY.PACKAGE%.gz.ncc",
@@ -72,14 +64,6 @@
                 "output": "build/release/release_executable_gz",
                 "options": {
                     "ncc_configuration": "release"
-                }
-            },
-            {
-                "name": "release_static-executable",
-                "build_type": "executable",
-                "output": "build/release/release_static_executable_gz",
-                "options": {
-                    "ncc_configuration": "release_static"
                 }
             },
             {
