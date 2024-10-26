@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2]
+
+This update introduces some additional features & bug fixes
+
+### Fixed
+ - Set default log level to 'info' in Utilities. instead of using `null` due to deprecation error
+
+
 ## [1.1.1] - 2024-10-13
 
 Update build system

@@ -84,7 +84,7 @@
         {
             $args = Parse::getArguments();
 
-            switch(strtolower(($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: null) ?? null)))
+            switch(strtolower(($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: 'info') ?? 'info')))
             {
                 case LevelType::DEBUG:
                 case 'debug':
