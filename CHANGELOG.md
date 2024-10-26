@@ -11,6 +11,7 @@ This update introduces some additional features & bug fixes
 
 ### Changed
  - All abstract classes are now enum classes
+ - Refactor to use RuntimeOptions in Console methods
 
 ### Fixed
  - Set default log level to 'info' in Utilities. instead of using `null` due to deprecation error
