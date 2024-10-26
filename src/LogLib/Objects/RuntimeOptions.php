@@ -17,7 +17,6 @@
         private LogLevel $fileLoggingLevel;
 
         /**
-         *
          * @return void
          */
         public function __construct()

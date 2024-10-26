@@ -109,17 +109,24 @@
         /**
          * Logs a message with a specified application name, level, optional message, and optional throwable.
          *
-         * @param string $application_name The name of the application
+         * @param string|null $application_name The name of the application
          * @param LogLevel $level The level type of the log (default is LevelType::INFO)
          * @param string|null $message The message of the log event
          * @param Throwable|null $throwable The exception that was thrown, if any
          * @return void
          */
-        private static function log(string $application_name, LogLevel $level=LogLevel::INFO, ?string $message=null, ?Throwable $throwable=null): void
+        private static function log(?string $application_name, LogLevel $level=LogLevel::INFO, ?string $message=null, ?Throwable $throwable=null): void
         {
-            $application = self::getOptions($application_name);
+            if($application_name === null)
+            {
+                $options = self::getRuntimeOptions();
+            }
+            else
+            {
+                $options = self::getOptions($application_name);
+            }
 
-            if(!Validate::checkLevelType($level, self::getRuntimeOptions()->getLoglevel()))
+            if(!Validate::checkLevelType($level, $options->getLoglevel()))
             {
                 return;
             }
@@ -136,9 +143,9 @@
                 $event->setBacktrace(Utilities::getBacktrace());
             }
 
-            if(self::getRuntimeOptions()->isConsoleOutput())
+            if($options->isConsoleOutput())
             {
-                Console::out($application, $event);
+                Console::out($options, $event);
             }
         }
 
@@ -218,7 +225,8 @@
          */
         public static function registerExceptionHandler(): void
         {
-            set_exception_handler(static function(Throwable $throwable) {
+            set_exception_handler(static function(Throwable $throwable)
+            {
                 self::error('Runtime', $throwable->getMessage(), $throwable);
             });
         }

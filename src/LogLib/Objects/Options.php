@@ -5,7 +5,7 @@
     namespace LogLib\Objects;
 
 
-    class Options
+    class Options extends RuntimeOptions
     {
         /**
          * @var string
@@ -17,8 +17,8 @@
          */
         public function __construct(string $application_name)
         {
-            $this->application_name = $application_name;
-        }
+            parent::__construct();
+            $this->application_name = $application_name;}
 
         /**
          * Returns the name of the Application
@@ -29,5 +29,4 @@
         {
             return $this->application_name;
         }
-
     }
