@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This update introduces some additional features & bug fixes
 
+### Changed
+ - All abstract classes are now enum classes
+
 ### Fixed
  - Set default log level to 'info' in Utilities. instead of using `null` due to deprecation error
 
