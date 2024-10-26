@@ -1,41 +1,41 @@
 <?php
 
-    namespace LogLib\Abstracts;
+    namespace LogLib\Enums;
 
-    final class CallType
+    enum CallType : string
     {
         /**
          * Represents a method call.
          *
          * @var string METHOD_CALL
          */
-        public const METHOD_CALL = '->';
+        case METHOD_CALL = '->';
 
         /**
          * Represents a static method call.
          *
          * @var string STATIC_CALL
          */
-        public const STATIC_CALL = '::';
+        case STATIC_CALL = '::';
 
         /**
          * Represents a function call.
          *
          * @var string FUNCTION_CALL
          */
-        public const FUNCTION_CALL = '()';
+        case FUNCTION_CALL = '()';
 
         /**
          * Represents a lambda function call.
          *
          * @var string LAMBDA_CALL
          */
-        public const LAMBDA_CALL = 'λ';
+        case LAMBDA_CALL = 'λ';
 
         /**
          * Represents an eval() call.
          *
          * @var string EVAL_CALL
          */
-        public const EVAL_CALL = 'eval()';
+        case EVAL_CALL = 'eval()';
     }

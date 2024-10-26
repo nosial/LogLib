@@ -4,115 +4,155 @@
 
     namespace LogLib\Objects;
 
-    use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Utilities;
+    use LogLib\Enums\LogLevel;
 
     class RuntimeOptions
     {
-        /**
-         * Indicates if the console output is enabled
-         *
-         * @var bool
-         * @property_name console_output
-         */
-        private $console_output;
+        private $consoleOutput;
+        private bool $displayAnsi;
+        private bool $handleExceptions;
+        private LogLevel $logLevel;
+        private bool $fileLoggingEnabled;
+        private LogLevel $fileLoggingLevel;
 
         /**
-         * Indicates if ANSI colors should be used in the console output
          *
-         * @var bool
-         * @property_name display_ansi
-         */
-        private $display_ansi;
-
-        /**
-         * Indicates if LogLib should handle uncaught exceptions
-         *
-         * @var bool
-         * @property_name handle_exceptions
-         */
-        private $handle_exceptions;
-
-        /**
-         * The current log level
-         *
-         * @var int
-         * @see LevelType
-         */
-        private $log_level;
-
-        /**
-         * Public Constructor
+         * @return void
          */
         public function __construct()
         {
-            $this->console_output = Utilities::runningInCli();
-            $this->display_ansi = Utilities::getDisplayAnsi();
-            $this->log_level = Utilities::getLogLevel();
-            $this->handle_exceptions = true;
+            $this->consoleOutput = Utilities::runningInCli();
+            $this->displayAnsi = Utilities::getDisplayAnsi();
+            $this->logLevel = Utilities::getLogLevel();
+            $this->fileLoggingEnabled = true;
+            $this->fileLoggingLevel = LogLevel::ERROR;
+            $this->handleExceptions = true;
         }
 
         /**
-         * @return bool
+         * Checks if console output is enabled.
+         *
+         * @return bool Returns true if console output is enabled, false otherwise.
          */
         public function isConsoleOutput(): bool
         {
-            return $this->console_output;
+            return $this->consoleOutput;
         }
 
         /**
-         * @param bool $console_output
+         * Set the console output flag.
+         *
+         * @param bool $consoleOutput Indicates whether to enable or disable console output.
+         * @return void
          */
-        public function setConsoleOutput(bool $console_output): void
+        public function setConsoleOutput(bool $consoleOutput): void
         {
-            $this->console_output = $console_output;
+            $this->consoleOutput = $consoleOutput;
         }
 
         /**
-         * @return bool
+         * Determines if ANSI display is enabled.
+         *
+         * @return bool Returns true if ANSI display is enabled, false otherwise.
          */
         public function displayAnsi(): bool
         {
-            return $this->display_ansi;
+            return $this->displayAnsi;
         }
 
         /**
-         * @param bool $display_ansi
+         * Sets whether to display ANSI colors in the console output.
+         *
+         * @param bool $displayAnsi A boolean value indicating whether ANSI colors should be displayed.
+         * @return void
          */
-        public function setDisplayAnsi(bool $display_ansi): void
+        public function setDisplayAnsi(bool $displayAnsi): void
         {
-            $this->display_ansi = $display_ansi;
+            $this->displayAnsi = $displayAnsi;
         }
 
         /**
-         * @return bool
+         * Get the flag indicating whether exceptions are being handled.
+         *
+         * @return bool True if exceptions are being handled
          */
         public function handleExceptions(): bool
         {
-            return $this->handle_exceptions;
+            return $this->handleExceptions;
         }
 
         /**
-         * @param bool $handle_exceptions
+         * Set the exception handling behavior.
+         *
+         * @param bool $handleExceptions A boolean value indicating whether to handle exceptions.
+         * @return void
          */
-        public function setHandleExceptions(bool $handle_exceptions): void
+        public function setHandleExceptions(bool $handleExceptions): void
         {
-            $this->handle_exceptions = $handle_exceptions;
+            $this->handleExceptions = $handleExceptions;
         }
 
         /**
-         * @return int
+         * Returns the current log level.
+         *
+         * @return LogLevel The current log level.
          */
-        public function getLoglevel(): int
+        public function getLoglevel(): LogLevel
         {
-            return $this->log_level;
+            return $this->logLevel;
         }
 
         /**
-         * @param int $log_level
+         * Sets the log level for logging operations.
+         *
+         * @param LogLevel $logLevel The log level to be set.
+         * @return void
          */
-        public function setLoglevel(int $log_level): void
+        public function setLoglevel(LogLevel $logLevel): void
         {
-            $this->log_level = $log_level;
+            $this->logLevel = $logLevel;
+        }
+
+        /**
+         * Checks if file logging is enabled.
+         *
+         * @return bool True if file logging is enabled, false otherwise.
+         */
+        public function isFileLoggingEnabled(): bool
+        {
+            return $this->fileLoggingEnabled;
+        }
+
+        /**
+         * Enables or disables file logging.
+         *
+         * @param bool $fileLoggingEnabled Indicates whether file logging should be enabled.
+         * @return void
+         */
+        public function setFileLoggingEnabled(bool $fileLoggingEnabled): void
+        {
+            $this->fileLoggingEnabled = $fileLoggingEnabled;
+        }
+
+        /**
+         * Gets the current file logging level.
+         *
+         * @return LogLevel The file logging level.
+         */
+        public function getFileLoggingLevel(): LogLevel
+        {
+            return $this->fileLoggingLevel;
+        }
+
+        /**
+         * Set the logging level for file output.
+         *
+         * @param LogLevel $fileLoggingLevel The logging level to be used for file output.
+         * @return void
+         */
+        public function setFileLoggingLevel(LogLevel $fileLoggingLevel): void
+        {
+            $this->fileLoggingLevel = $fileLoggingLevel;
         }
     }

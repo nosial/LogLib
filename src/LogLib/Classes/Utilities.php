@@ -2,8 +2,8 @@
 
     namespace LogLib\Classes;
 
-    use LogLib\Abstracts\CallType;
-    use LogLib\Abstracts\LevelType;
+    use LogLib\Enums\CallType;
+    use LogLib\Enums\LogLevel;
     use LogLib\Objects\Event;
     use OptsLib\Parse;
     use Throwable;
@@ -28,19 +28,19 @@
         /**
          * Converts a log level to its corresponding string representation.
          *
-         * @param int $level The log level to convert.
+         * @param LogLevel $level The log level to convert.
          * @return string The string representation of the log level.
          */
-        public static function levelToString(int $level): string
+        public static function levelToString(LogLevel $level): string
         {
             return match ($level)
             {
-                LevelType::DEBUG => 'DBG',
-                LevelType::VERBOSE => 'VRB',
-                LevelType::INFO => 'INF',
-                LevelType::WARNING => 'WRN',
-                LevelType::FATAL => 'CRT',
-                LevelType::ERROR => 'ERR',
+                LogLevel::DEBUG => 'DBG',
+                LogLevel::VERBOSE => 'VRB',
+                LogLevel::INFO => 'INF',
+                LogLevel::WARNING => 'WRN',
+                LogLevel::FATAL => 'CRT',
+                LogLevel::ERROR => 'ERR',
                 default => 'UNK',
             };
         }
@@ -69,7 +69,7 @@
         /**
          * Returns the log level based on the configuration.
          *
-         * @return int The log level. This value represents the severity or importance of the log messages.
+         * @return LogLevel The log level. This value represents the severity or importance of the log messages.
          *             The returned value will be one of the constants defined in the LevelType class:
          *                 - DEBUG (6)
          *                 - VERBOSE (5)
@@ -80,54 +80,54 @@
          *                 - SILENT (0)
          *             If no log level is configured or the configured level is not recognized, the INFO level (4) will be returned by default.
          */
-        public static function getLogLevel(): int
+        public static function getLogLevel(): LogLevel
         {
             $args = Parse::getArguments();
 
             switch(strtolower(($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: 'info') ?? 'info')))
             {
-                case LevelType::DEBUG:
+                case LogLevel::DEBUG:
                 case 'debug':
                 case '6':
                 case 'dbg':
-                    return LevelType::DEBUG;
+                    return LogLevel::DEBUG;
 
-                case LevelType::VERBOSE:
+                case LogLevel::VERBOSE:
                 case 'verbose':
                 case '5':
                 case 'vrb':
-                    return LevelType::VERBOSE;
+                    return LogLevel::VERBOSE;
 
                 default:
-                case LevelType::INFO:
+                case LogLevel::INFO:
                 case 'info':
                 case '4':
                 case 'inf':
-                    return LevelType::INFO;
+                    return LogLevel::INFO;
 
-                case LevelType::WARNING:
+                case LogLevel::WARNING:
                 case 'warning':
                 case '3':
                 case 'wrn':
-                    return LevelType::WARNING;
+                    return LogLevel::WARNING;
 
-                case LevelType::ERROR:
+                case LogLevel::ERROR:
                 case 'error':
                 case '2':
                 case 'err':
-                    return LevelType::ERROR;
+                    return LogLevel::ERROR;
 
-                case LevelType::FATAL:
+                case LogLevel::FATAL:
                 case 'fatal':
                 case '1':
                 case 'crt':
-                    return LevelType::FATAL;
+                    return LogLevel::FATAL;
 
-                case LevelType::SILENT:
+                case LogLevel::SILENT:
                 case 'silent':
                 case '0':
                 case 'sil':
-                    return LevelType::SILENT;
+                    return LogLevel::SILENT;
             }
         }
 
@@ -164,7 +164,7 @@
         {
             if($event->getBacktrace() === null || count($event->getBacktrace()) === 0)
             {
-                return CallType::LAMBDA_CALL;
+                return CallType::LAMBDA_CALL->value;
             }
 
             $backtrace = $event->getBacktrace()[count($event->getBacktrace()) - 1];
@@ -184,20 +184,20 @@
             {
                 if(isset($backtrace['file']))
                 {
-                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '') . CallType::STATIC_CALL . CallType::LAMBDA_CALL;
+                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '') . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
                 }
 
-                return basename($backtrace['file']) . CallType::STATIC_CALL . CallType::LAMBDA_CALL;
+                return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
             }
 
             if($backtrace['function'] === 'eval')
             {
                 if(isset($backtrace['file']))
                 {
-                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '') . CallType::STATIC_CALL . CallType::EVAL_CALL;
+                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '') . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
                 }
 
-                return basename($backtrace['file']) . CallType::STATIC_CALL . CallType::EVAL_CALL;
+                return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
             }
 
             if($ansi)
@@ -218,11 +218,11 @@
 
             if($class === null)
             {
-                return $function . CallType::FUNCTION_CALL;
+                return $function . CallType::FUNCTION_CALL->value;
             }
 
             $type = ($backtrace['type'] === CallType::METHOD_CALL ? CallType::METHOD_CALL : CallType::STATIC_CALL);
-            return "{$class}{$type}{$function}" . CallType::FUNCTION_CALL;
+            return "{$class}{$type->value}{$function}" . CallType::FUNCTION_CALL->value;
         }
 
 

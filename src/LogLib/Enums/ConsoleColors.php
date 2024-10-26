@@ -1,42 +1,42 @@
 <?php
 
-    namespace LogLib\Abstracts;
+    namespace LogLib\Enums;
 
-    final class ConsoleColors
+    enum ConsoleColors : string
     {
-        public const BLACK = "0;30";
+        case BLACK = "0;30";
 
-        public const DARK_GRAY = "1;30";
+        case DARK_GRAY = "1;30";
 
-        public const BLUE = "0;34";
+        case BLUE = "0;34";
 
-        public const LIGHT_BLUE = "1;34";
+        case LIGHT_BLUE = "1;34";
 
-        public const GREEN = "0;32";
+        case GREEN = "0;32";
 
-        public const LIGHT_GREEN = "1;32";
+        case LIGHT_GREEN = "1;32";
 
-        public const CYAN = "0;36";
+        case CYAN = "0;36";
 
-        public const LIGHT_CYAN = "1;36";
+        case LIGHT_CYAN = "1;36";
 
-        public const RED = "0;31";
+        case RED = "0;31";
 
-        public const LIGHT_RED = "1;31";
+        case LIGHT_RED = "1;31";
 
-        public const PURPLE = "0;35";
+        case PURPLE = "0;35";
 
-        public const LIGHT_PURPLE = "1;35";
+        case LIGHT_PURPLE = "1;35";
 
-        public const BROWN = "0;33";
+        case BROWN = "0;33";
 
-        public const YELLOW = "1;33";
+        case YELLOW = "1;33";
 
-        public const LIGHT_GRAY = "0;37";
+        case LIGHT_GRAY = "0;37";
 
-        public const WHITE = "1;37";
+        case WHITE = "1;37";
 
-        public const RESET = "0";
+        case RESET = "0";
 
         /**
          * Represents an array of all possible supported color values.

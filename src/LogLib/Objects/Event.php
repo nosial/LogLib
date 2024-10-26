@@ -4,15 +4,14 @@
 
     namespace LogLib\Objects;
 
-    use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Utilities;
+    use LogLib\Enums\LogLevel;
     use Throwable;
 
     class Event
     {
         /**
-         * @see LevelType
-         * @var int
+         * @var LogLevel
          */
         private $level;
 
@@ -35,11 +34,11 @@
          * Event constructor.
          *
          * @param string $message
-         * @param int $level
+         * @param LogLevel $level
          * @param Throwable|null $exception
          * @param array|null $backtrace
          */
-        public function __construct(string $message, int $level, ?Throwable $exception=null, ?array $backtrace=null)
+        public function __construct(string $message, LogLevel $level, ?Throwable $exception=null, ?array $backtrace=null)
         {
             $this->message = $message;
             $this->level = $level;
@@ -50,10 +49,10 @@
         /**
          * Returns the level of the event
          *
-         * @see LevelType
-         * @return int
+         * @return LogLevel
+         * @see LogLevel
          */
-        public function getLevel(): int
+        public function getLevel(): LogLevel
         {
             return $this->level;
         }
@@ -108,5 +107,4 @@
         {
             $this->backtrace = $backtrace;
         }
-
     }

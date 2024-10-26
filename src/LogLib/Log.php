@@ -5,10 +5,10 @@
     namespace LogLib;
 
     use InvalidArgumentException;
-    use LogLib\Abstracts\LevelType;
     use LogLib\Classes\Console;
     use LogLib\Classes\Utilities;
     use LogLib\Classes\Validate;
+    use LogLib\Enums\LogLevel;
     use LogLib\Objects\Event;
     use LogLib\Objects\Options;
     use LogLib\Objects\RuntimeOptions;
@@ -110,20 +110,14 @@
          * Logs a message with a specified application name, level, optional message, and optional throwable.
          *
          * @param string $application_name The name of the application
-         * @param int $level The level type of the log (default is LevelType::INFO)
+         * @param LogLevel $level The level type of the log (default is LevelType::INFO)
          * @param string|null $message The message of the log event
          * @param Throwable|null $throwable The exception that was thrown, if any
          * @return void
-         * @throws InvalidArgumentException If the provided level type is invalid or a message is null
          */
-        private static function log(string $application_name, int $level=LevelType::INFO, ?string $message=null, ?Throwable $throwable=null): void
+        private static function log(string $application_name, LogLevel $level=LogLevel::INFO, ?string $message=null, ?Throwable $throwable=null): void
         {
             $application = self::getOptions($application_name);
-
-            if(!Validate::levelType($level))
-            {
-                throw new InvalidArgumentException(sprintf('Invalid level type: %s', $level));
-            }
 
             if(!Validate::checkLevelType($level, self::getRuntimeOptions()->getLoglevel()))
             {
@@ -155,7 +149,7 @@
          */
         public static function info(string $application_name, string $message): void
         {
-            self::log($application_name, LevelType::INFO, $message);
+            self::log($application_name, LogLevel::INFO, $message);
         }
 
         /**
@@ -165,7 +159,7 @@
          */
         public static function verbose(string $application_name, string $message): void
         {
-            self::log($application_name, LevelType::VERBOSE, $message);
+            self::log($application_name, LogLevel::VERBOSE, $message);
         }
 
         /**
@@ -175,7 +169,7 @@
          */
         public static function debug(string $application_name, string $message): void
         {
-            self::log($application_name, LevelType::DEBUG, $message);
+            self::log($application_name, LogLevel::DEBUG, $message);
         }
 
         /**
@@ -188,7 +182,7 @@
          */
         public static function warning(string $application_name, string $message, ?Throwable $throwable=null): void
         {
-            self::log($application_name, LevelType::WARNING, $message, $throwable);
+            self::log($application_name, LogLevel::WARNING, $message, $throwable);
         }
 
         /**
@@ -201,7 +195,7 @@
          **/
         public static function error(string $application_name, string $message, ?Throwable $throwable=null): void
         {
-            self::log($application_name, LevelType::ERROR, $message, $throwable);
+            self::log($application_name, LogLevel::ERROR, $message, $throwable);
         }
 
         /**
@@ -214,7 +208,7 @@
          */
         public static function fatal(string $application_name, string $message, ?Throwable $throwable=null): void
         {
-            self::log($application_name, LevelType::FATAL, $message, $throwable);
+            self::log($application_name, LogLevel::FATAL, $message, $throwable);
         }
 
         /**

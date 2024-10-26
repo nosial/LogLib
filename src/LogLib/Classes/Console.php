@@ -5,8 +5,8 @@
     namespace LogLib\Classes;
 
     use Exception;
-    use LogLib\Abstracts\ConsoleColors;
-    use LogLib\Abstracts\LevelType;
+    use LogLib\Enums\ConsoleColors;
+    use LogLib\Enums\LogLevel;
     use LogLib\Log;
     use LogLib\Objects\Event;
     use LogLib\Objects\Options;
@@ -15,21 +15,9 @@
 
     class Console
     {
-        /**
-         * @var array
-         */
-        private static $application_colors = [];
-
-
-        /**
-         * @var float|int|null
-         */
-        private static $last_tick_time;
-
-        /**
-         * @var int|null
-         */
-        private static $largest_tick_length;
+        private static array $application_colors = [];
+        private static float|int|null $last_tick_time;
+        private static ?int $largest_tick_length;
 
         /**
          * Formats the application name with a color for the console
@@ -68,17 +56,17 @@
          * Applies a specified color to the given text, using ANSI escape sequences.
          *
          * @param string $text The text to apply the color to.
-         * @param string $color The ANSI color code to apply to the text.
+         * @param ConsoleColors $color The ANSI color code to apply to the text.
          * @return string The text with the specified color applied.
          */
-        private static function color(string $text, string $color): string
+        private static function color(string $text, ConsoleColors $color): string
         {
             if(!Log::getRuntimeOptions()->displayAnsi())
             {
                 return $text;
             }
 
-            return "\033[" . $color . "m" . $text . "\033[0m";
+            return "\033[" . $color->value . "m" . $text . "\033[0m";
         }
 
         /**
@@ -96,12 +84,12 @@
 
             $color = match($event->getLevel())
             {
-                LevelType::DEBUG => ConsoleColors::LIGHT_PURPLE,
-                LevelType::VERBOSE => ConsoleColors::LIGHT_CYAN,
-                LevelType::INFO => ConsoleColors::WHITE,
-                LevelType::WARNING => ConsoleColors::YELLOW,
-                LevelType::FATAL => ConsoleColors::RED,
-                LevelType::ERROR => ConsoleColors::LIGHT_RED,
+                LogLevel::DEBUG => ConsoleColors::LIGHT_PURPLE,
+                LogLevel::VERBOSE => ConsoleColors::LIGHT_CYAN,
+                LogLevel::INFO => ConsoleColors::WHITE,
+                LogLevel::WARNING => ConsoleColors::YELLOW,
+                LogLevel::FATAL => ConsoleColors::RED,
+                LogLevel::ERROR => ConsoleColors::LIGHT_RED,
                 default => null,
             };
 
@@ -165,7 +153,7 @@
                 return;
             }
 
-            if(Validate::checkLevelType(LevelType::DEBUG, Log::getRuntimeOptions()->getLoglevel()))
+            if(Validate::checkLevelType(LogLevel::DEBUG, Log::getRuntimeOptions()->getLoglevel()))
             {
                 $backtrace_output = Utilities::getTraceString($event, Log::getRuntimeOptions()->displayAnsi());
 
@@ -184,7 +172,7 @@
                 return;
             }
 
-            if(Validate::checkLevelType(LevelType::VERBOSE, Log::getRuntimeOptions()->getLoglevel()))
+            if(Validate::checkLevelType(LogLevel::VERBOSE, Log::getRuntimeOptions()->getLoglevel()))
             {
                 $backtrace_output = Utilities::getTraceString($event, Log::getRuntimeOptions()->displayAnsi());
 

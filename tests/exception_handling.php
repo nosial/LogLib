@@ -1,10 +1,9 @@
 <?php
 
-    use LogLib\Abstracts\LevelType;
-    use LogLib\Log;
-    use LogLib\Objects\Options;
+use LogLib\Log;
+use LogLib\Objects\Options;
 
-    require('ncc');
+require('ncc');
     import('net.nosial.loglib', 'latest');
 
     $options = new Options('net.nosial.optslib');

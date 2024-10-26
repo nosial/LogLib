@@ -1,43 +1,43 @@
 <?php
 
-    namespace LogLib\Abstracts;
+    namespace LogLib\Enums;
 
-    final class LevelType
+    enum LogLevel : int
     {
         /**
          * Silent type.
          */
-        public const SILENT = 0;
+        case SILENT = 0;
 
         /**
          * Fatal type.
          */
-        public const FATAL = 1;
+        case FATAL = 1;
 
         /**
          * Error type.
          */
-        public const ERROR = 2;
+        case ERROR = 2;
 
         /**
          *
          */
-        public const WARNING = 3;
+        case WARNING = 3;
 
         /**
          * Information type.
          */
-        public const INFO = 4;
+        case INFO = 4;
 
         /**
          * Verbose type.
          */
-        public const VERBOSE = 5;
+        case VERBOSE = 5;
 
         /**
          * Debug type.
          */
-        public const DEBUG = 6;
+        case DEBUG = 6;
 
         /**
          * All types.
