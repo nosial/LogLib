@@ -2,7 +2,6 @@
 
 namespace LogLib;
 
-use LogLib\Exceptions\LoggingException;
 use LogLib\Objects\Application;
 use Throwable;
 
@@ -22,7 +21,6 @@ class Logger extends Application
      *
      * @param string $message The message to log.
      * @return void
-     * @throws LoggingException
      */
     public function info(string $message): void
     {
@@ -34,7 +32,6 @@ class Logger extends Application
      *
      * @param string $message The message to be logged.
      * @return void
-     * @throws LoggingException
      */
     public function verbose(string $message): void
     {
@@ -46,7 +43,6 @@ class Logger extends Application
      *
      * @param string $message The debug message to log.
      * @return void
-     * @throws LoggingException
      */
     public function debug(string $message): void
     {
@@ -58,7 +54,6 @@ class Logger extends Application
      *
      * @param string $message The warning message to log.
      * @return void
-     * @throws LoggingException
      */
     public function warning(string $message): void
     {
@@ -71,7 +66,6 @@ class Logger extends Application
      * @param string $message The error message to be logged.
      * @param Throwable|null $throwable An optional throwable instance to be logged along with the error message.
      * @return void
-     * @throws LoggingException
      */
     public function error(string $message, ?Throwable $throwable=null): void
     {
@@ -84,7 +78,6 @@ class Logger extends Application
      * @param string $message The fatal error message to log.
      * @param Throwable|null $throwable Optional throwable associated with the fatal error.
      * @return void
-     * @throws LoggingException
      */
     public function fatal(string $message, ?Throwable $throwable=null): void
     {

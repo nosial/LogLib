@@ -7,10 +7,10 @@ use LogLib\Classes\Utilities;
 use LogLib\Classes\Validate;
 use LogLib\Enums\ConsoleColors;
 use LogLib\Enums\LogLevel;
-use LogLib\Exceptions\LoggingException;
 use LogLib\Interfaces\LogHandlerInterface;
 use LogLib\Objects\Application;
 use LogLib\Objects\Event;
+use RuntimeException;
 use Throwable;
 
 class ConsoleLogging implements LogHandlerInterface
@@ -77,7 +77,6 @@ class ConsoleLogging implements LogHandlerInterface
      *
      * @param string $application_name The application name
      * @return string The formatted application name
-     * @throws LoggingException If unable to generate a random color for the application
      */
     private static function formatAppColor(string $application_name): string
     {
@@ -91,7 +90,7 @@ class ConsoleLogging implements LogHandlerInterface
             }
             catch (Exception $e)
             {
-                throw new LoggingException(sprintf('Unable to generate random color for application "%s"', $application_name), $e->getCode(), $e);
+                throw new RuntimeException(sprintf('Unable to generate random color for application "%s"', $application_name), $e->getCode(), $e);
             }
 
             self::$application_colors[$application_name] = $color;

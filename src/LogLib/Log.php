@@ -4,10 +4,10 @@
 
     namespace LogLib;
 
+    use Exception;
     use InvalidArgumentException;
     use LogLib\Classes\Utilities;
     use LogLib\Enums\LogLevel;
-    use LogLib\Exceptions\LoggingException;
     use LogLib\Objects\Application;
     use LogLib\Objects\Event;
     use Throwable;
@@ -23,6 +23,7 @@
          * Registers a new application logger
          *
          * @param Application $application The options for the application
+         * @param bool $overwrite
          * @return bool
          */
         public static function register(Application $application, bool $overwrite=false): bool
@@ -107,7 +108,6 @@
          * @param string|null $message The message of the log event
          * @param Throwable|null $throwable The exception that was thrown, if any
          * @return void
-         * @throws LoggingException
          */
         private static function log(?string $application_name, LogLevel $level=LogLevel::INFO, ?string $message=null, ?Throwable $throwable=null): void
         {
@@ -140,7 +140,6 @@
          * @param string $application_name The name of the application
          * @param string $message The message of the event
          * @return void
-         * @throws LoggingException
          */
         public static function info(string $application_name, string $message): void
         {
@@ -151,7 +150,6 @@
          * @param string $application_name The name of the application
          * @param string $message The message of the event
          * @return void
-         * @throws LoggingException
          */
         public static function verbose(string $application_name, string $message): void
         {
@@ -162,7 +160,6 @@
          * @param string $application_name The name of the application
          * @param string $message The message of the event
          * @return void
-         * @throws LoggingException
          */
         public static function debug(string $application_name, string $message): void
         {
@@ -176,7 +173,6 @@
          * @param string $message The warning message to log.
          * @param Throwable|null $throwable (Optional) The throwable object associated with the warning.
          * @return void
-         * @throws LoggingException
          */
         public static function warning(string $application_name, string $message, ?Throwable $throwable=null): void
         {
@@ -190,7 +186,6 @@
          * @param string $message The error message.
          * @param Throwable|null $throwable The optional throwable object associated with the error.
          * @return void
-         * @throws LoggingException
          */
         public static function error(string $application_name, string $message, ?Throwable $throwable=null): void
         {
@@ -204,7 +199,6 @@
          * @param string $message The fatal message to log.
          * @param Throwable|null $throwable (Optional) The throwable object associated with the fatal message.
          * @return void
-         * @throws LoggingException
          */
         public static function fatal(string $application_name, string $message, ?Throwable $throwable=null): void
         {
@@ -224,7 +218,7 @@
                 {
                     self::error('Runtime', $throwable->getMessage(), $throwable);
                 }
-                catch(LoggingException)
+                catch(Exception)
                 {
                     return;
                 }

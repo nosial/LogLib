@@ -6,10 +6,10 @@ use LogLib\Classes\FileLock;
 use LogLib\Classes\Utilities;
 use LogLib\Classes\Validate;
 use LogLib\Enums\LogLevel;
-use LogLib\Exceptions\LoggingException;
 use LogLib\Interfaces\LogHandlerInterface;
 use LogLib\Objects\Application;
 use LogLib\Objects\Event;
+use RuntimeException;
 use Throwable;
 
 class FileLogging implements LogHandlerInterface
@@ -80,7 +80,6 @@ class FileLogging implements LogHandlerInterface
      *
      * @param Application $application The application instance for which the log file is to be retrieved.
      * @return string The full path of the log file.
-     * @throws LoggingException If the logging directory is not writable or cannot be created.
      */
     private static function getLogFile(Application $application): string
     {
@@ -88,7 +87,7 @@ class FileLogging implements LogHandlerInterface
 
         if(!is_writable($logging_directory))
         {
-            throw new LoggingException(sprintf("Cannot write to %s due to insufficient permissions", $logging_directory));
+            throw new RuntimeException(sprintf("Cannot write to %s due to insufficient permissions", $logging_directory));
         }
 
         if(!file_exists($logging_directory))
