@@ -9,13 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This update introduces some additional features & bug fixes
 
+### Added
+ - Added File Logging support
+ - Added LogHandlerInterface & refactored Application settings to allow for use of custom logging handlers
+ - Added Logging type for logging type handling
+
 ### Changed
  - All abstract classes are now enum classes
- - Refactor to use RuntimeOptions in Console methods
+ - Refactored Console Logging to use the new LogHandlerInterface
 
 ### Fixed
  - Set default log level to 'info' in Utilities. instead of using `null` due to deprecation error
 
+### Removed
+- Removed Unused BRIGHT_COLORS constant from ConsoleColors
+- Removed Unused Options object
+- Removed Unused RuntimeOptions object
+- Removed unused Console class
 
 
 ## [1.1.1] - 2024-10-13
