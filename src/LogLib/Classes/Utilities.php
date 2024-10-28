@@ -345,7 +345,7 @@
             $args = Parse::getArguments();
             $LOGGING_DIRECTORY = ($args['logging-directory'] ?? getenv('LOGGING_DIRECTORY') ?? null);
 
-            if($LOGGING_DIRECTORY === null)
+            if($LOGGING_DIRECTORY === null || $LOGGING_DIRECTORY === false || strlen($LOGGING_DIRECTORY) === 0)
             {
                 return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'logs';
             }

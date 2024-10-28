@@ -4,6 +4,7 @@
 
     namespace LogLib;
 
+    use ErrorException;
     use Exception;
     use InvalidArgumentException;
     use LogLib\Classes\Utilities;
@@ -221,6 +222,31 @@
                 catch(Exception)
                 {
                     return;
+                }
+            });
+
+            // Register error handler
+            set_error_handler(static function($errno, $errstr, $errfile, $errline)
+            {
+                // Convert error to exception and throw it
+                try
+                {
+                    self::warning('Runtime', sprintf("%s:%s (%s) %s", $errfile, $errline, $errno, $errstr));
+                }
+                catch(Exception)
+                {
+                    return;
+                }
+            });
+
+            register_shutdown_function(static function()
+            {
+                $error = error_get_last();
+                if ($error !== null && ($error['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR)))
+                {
+                    // Convert fatal error to exception and handle it
+                    $exception = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
+                    self::error('Fatal', $exception->getMessage(), $exception);
                 }
             });
         }
