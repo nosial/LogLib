@@ -61,15 +61,4 @@
             self::LIGHT_GRAY,
             self::WHITE
         ];
-
-        /**
-         * A list of random usable bright colors
-         */
-        public const BRIGHT_COLORS = [
-            self::LIGHT_BLUE,
-            self::LIGHT_GREEN,
-            self::LIGHT_CYAN,
-            self::LIGHT_RED,
-            self::LIGHT_PURPLE,
-        ];
     }
