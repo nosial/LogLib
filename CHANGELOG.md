@@ -13,6 +13,7 @@ This update introduces some additional features & bug fixes
  - Added File Logging support
  - Added LogHandlerInterface & refactored Application settings to allow for use of custom logging handlers
  - Added Logging type for logging type handling
+ - Added a Logger object for creating a logging instance for Applications
 
 ### Changed
  - All abstract classes are now enum classes
