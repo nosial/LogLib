@@ -25,10 +25,16 @@
          * @param Application $application The options for the application
          * @return bool
          */
-        public static function register(Application $application): bool
+        public static function register(Application $application, bool $overwrite=false): bool
         {
             if(self::isRegistered($application->getApplicationName()))
             {
+                if($overwrite)
+                {
+                    self::$applications[$application->getApplicationName()] = $application;
+                    return true;
+                }
+
                 return false;
             }
 
