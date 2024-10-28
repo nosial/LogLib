@@ -5,7 +5,6 @@ namespace LogLib\Handlers;
 use LogLib\Classes\FileLock;
 use LogLib\Classes\Utilities;
 use LogLib\Classes\Validate;
-use LogLib\Enums\LogHandlerType;
 use LogLib\Enums\LogLevel;
 use LogLib\Exceptions\LoggingException;
 use LogLib\Interfaces\LogHandlerInterface;
@@ -59,11 +58,6 @@ class FileLogging implements LogHandlerInterface
         self::getLogger($application)->append($output);
     }
 
-    public static function getType(): LogHandlerType
-    {
-        return LogHandlerType::FILE;
-    }
-
     private static function getLogger(Application $application): FileLock
     {
         if(!isset(self::$application_logs[$application->getApplicationName()]))
@@ -96,23 +90,6 @@ class FileLogging implements LogHandlerInterface
         }
 
         return $logging_file;
-    }
-
-    private static function getExceptionFile(Application $application, \Throwable $e): string
-    {
-        $logging_directory = $application->getFileLoggingDirectory();
-
-        if(!is_writable($logging_directory))
-        {
-            throw new LoggingException(sprintf("Cannot write to %s due to insufficient permissions", $logging_directory));
-        }
-
-        if(!file_exists($logging_directory))
-        {
-            mkdir($logging_directory);
-        }
-
-        return Utilities::sanitizeFileName($application->getApplicationName()) . '-' . Utilities::sanitizeFileName(get_class($e)) . '-' . date('d-m-Y-H-i-s') . '.json';
     }
 
     private static function getTimestamp(): string

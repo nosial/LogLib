@@ -2,11 +2,9 @@
 
 namespace LogLib\Interfaces;
 
-use LogLib\Enums\LogHandlerType;
 use LogLib\Exceptions\LoggingException;
 use LogLib\Objects\Application;
 use LogLib\Objects\Event;
-use LogLib\Objects\Options;
 
 interface LogHandlerInterface
 {
@@ -19,11 +17,4 @@ interface LogHandlerInterface
      * @throws LoggingException If an error occurs while handling the event
      */
     public static function handle(Application $application, Event $event): void;
-
-    /**
-     * Returns the type of log handler.
-     *
-     * @return LogHandlerType
-     */
-    public static function getType(): LogHandlerType;
 }

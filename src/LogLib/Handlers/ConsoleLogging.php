@@ -6,7 +6,6 @@ use Exception;
 use LogLib\Classes\Utilities;
 use LogLib\Classes\Validate;
 use LogLib\Enums\ConsoleColors;
-use LogLib\Enums\LogHandlerType;
 use LogLib\Enums\LogLevel;
 use LogLib\Exceptions\LoggingException;
 use LogLib\Interfaces\LogHandlerInterface;
@@ -71,14 +70,6 @@ class ConsoleLogging implements LogHandlerInterface
             self::colorize($event),
             $event->getMessage()
         ));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function getType(): LogHandlerType
-    {
-        return LogHandlerType::CONSOLE;
     }
 
     /**
