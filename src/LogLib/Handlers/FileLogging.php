@@ -85,14 +85,12 @@ class FileLogging implements LogHandlerInterface
     {
         $logging_directory = $application->getFileLoggingDirectory();
 
-        if(!is_writable($logging_directory))
-        {
-            throw new RuntimeException(sprintf("Cannot write to %s due to insufficient permissions", $logging_directory));
-        }
-
         if(!file_exists($logging_directory))
         {
-            mkdir($logging_directory);
+            if(!mkdir($logging_directory))
+            {
+                throw new RuntimeException(sprintf("Cannot write to %s due to insufficient permissions", $logging_directory));
+            }
         }
 
         $logging_file = $logging_directory . DIRECTORY_SEPARATOR . Utilities::sanitizeFileName($application->getApplicationName()) . date('Y-m-d') . '.log';
