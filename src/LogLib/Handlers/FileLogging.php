@@ -58,6 +58,13 @@ class FileLogging implements LogHandlerInterface
         self::getLogger($application)->append($output);
     }
 
+    /**
+     * Retrieves the logger instance associated with the given application.
+     * If the logger does not exist, it initializes a new one and stores it.
+     *
+     * @param Application $application The application for which the logger is to be retrieved.
+     * @return FileLock The logger instance associated with the specified application.
+     */
     private static function getLogger(Application $application): FileLock
     {
         if(!isset(self::$application_logs[$application->getApplicationName()]))
@@ -68,6 +75,13 @@ class FileLogging implements LogHandlerInterface
         return self::$application_logs[$application->getApplicationName()];
     }
 
+    /**
+     * Retrieves the log file path for the specified application.
+     *
+     * @param Application $application The application instance for which the log file is to be retrieved.
+     * @return string The full path of the log file.
+     * @throws LoggingException If the logging directory is not writable or cannot be created.
+     */
     private static function getLogFile(Application $application): string
     {
         $logging_directory = $application->getFileLoggingDirectory();
@@ -92,11 +106,23 @@ class FileLogging implements LogHandlerInterface
         return $logging_file;
     }
 
+    /**
+     * Retrieves the current timestamp formatted as "yd/m/y H:i".
+     *
+     * @return string The formatted current timestamp.
+     */
     private static function getTimestamp(): string
     {
         return date('yd/m/y H:i');
     }
 
+    /**
+     * Generates a detailed string representation of a given Throwable object, including its message, code,
+     * file, line of occurrence, stack trace, and any previous exceptions.
+     *
+     * @param Throwable|null $exception The throwable object to process. If null, an empty string is returned.
+     * @return string A detailed string representation of the throwable object.
+     */
     private static function outException(?Throwable $exception=null): string
     {
         if($exception === null)
