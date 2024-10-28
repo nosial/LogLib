@@ -5,36 +5,29 @@
     namespace LogLib;
 
     use InvalidArgumentException;
-    use LogLib\Classes\Console;
     use LogLib\Classes\Utilities;
-    use LogLib\Classes\Validate;
     use LogLib\Enums\LogLevel;
+    use LogLib\Exceptions\LoggingException;
+    use LogLib\Objects\Application;
     use LogLib\Objects\Event;
-    use LogLib\Objects\Options;
-    use LogLib\Objects\RuntimeOptions;
     use Throwable;
 
     class Log
     {
         /**
-         * @var Options[]|null
+         * @var Application[]|null
          */
         private static $applications;
 
         /**
-         * @var RuntimeOptions|null
-         */
-        private static $runtime_options;
-
-        /**
          * Registers a new application logger
          *
-         * @param Options $options The options for the application
+         * @param Application $application The options for the application
          * @return bool
          */
-        public static function register(Options $options): bool
+        public static function register(Application $application): bool
         {
-            if(self::isRegistered($options->getApplicationName()))
+            if(self::isRegistered($application->getApplicationName()))
             {
                 return false;
             }
@@ -44,7 +37,7 @@
                 self::$applications = [];
             }
 
-            self::$applications[$options->getApplicationName()] = $options;
+            self::$applications[$application->getApplicationName()] = $application;
             return true;
         }
 
@@ -79,31 +72,25 @@
         }
 
         /**
-         * @param string $application
-         * @return Options
+         * Retrieves the application options. If the application is not registered, it optionally creates and registers a new one.
+         *
+         * @param string $application The name of the application.
+         * @param bool $create (Optional) Whether to create the application if it is not registered. Default is true.
+         * @return Application The options for the specified application.
          */
-        public static function getApplication(string $application): Options
+        public static function getApplication(string $application, bool $create=true): Application
         {
             if(!self::isRegistered($application))
             {
-                throw new InvalidArgumentException("The application '$application' is not registered");
+                if(!$create)
+                {
+                    throw new InvalidArgumentException("The application '$application' is not registered");
+                }
+
+                self::register(new Application($application));
             }
 
             return self::$applications[$application];
-        }
-
-        /**
-         * @param string $application_name The name of the application
-         * @return Options The options for the application
-         */
-        public static function getOptions(string $application_name): Options
-        {
-            if(!self::isRegistered($application_name))
-            {
-                self::register(new Options($application_name));
-            }
-
-            return self::$applications[$application_name];
         }
 
         /**
@@ -114,22 +101,11 @@
          * @param string|null $message The message of the log event
          * @param Throwable|null $throwable The exception that was thrown, if any
          * @return void
+         * @throws LoggingException
          */
         private static function log(?string $application_name, LogLevel $level=LogLevel::INFO, ?string $message=null, ?Throwable $throwable=null): void
         {
-            if($application_name === null)
-            {
-                $options = self::getRuntimeOptions();
-            }
-            else
-            {
-                $options = self::getOptions($application_name);
-            }
-
-            if(!Validate::checkLevelType($level, $options->getLoglevel()))
-            {
-                return;
-            }
+            $application = self::getApplication($application_name);
 
             if($message === null)
             {
@@ -143,9 +119,14 @@
                 $event->setBacktrace(Utilities::getBacktrace());
             }
 
-            if($options->isConsoleOutput())
+            if($application->isConsoleLoggingEnabled())
             {
-                Console::out($options, $event);
+                $application->getConsoleLoggingHandler()::handle($application, $event);
+            }
+
+            if($application->isFileLoggingEnabled())
+            {
+                $application->getFileLoggingHandler()::handle($application, $event);
             }
         }
 
@@ -153,6 +134,7 @@
          * @param string $application_name The name of the application
          * @param string $message The message of the event
          * @return void
+         * @throws LoggingException
          */
         public static function info(string $application_name, string $message): void
         {
@@ -163,6 +145,7 @@
          * @param string $application_name The name of the application
          * @param string $message The message of the event
          * @return void
+         * @throws LoggingException
          */
         public static function verbose(string $application_name, string $message): void
         {
@@ -173,6 +156,7 @@
          * @param string $application_name The name of the application
          * @param string $message The message of the event
          * @return void
+         * @throws LoggingException
          */
         public static function debug(string $application_name, string $message): void
         {
@@ -186,6 +170,7 @@
          * @param string $message The warning message to log.
          * @param Throwable|null $throwable (Optional) The throwable object associated with the warning.
          * @return void
+         * @throws LoggingException
          */
         public static function warning(string $application_name, string $message, ?Throwable $throwable=null): void
         {
@@ -199,7 +184,8 @@
          * @param string $message The error message.
          * @param Throwable|null $throwable The optional throwable object associated with the error.
          * @return void
-         **/
+         * @throws LoggingException
+         */
         public static function error(string $application_name, string $message, ?Throwable $throwable=null): void
         {
             self::log($application_name, LogLevel::ERROR, $message, $throwable);
@@ -212,6 +198,7 @@
          * @param string $message The fatal message to log.
          * @param Throwable|null $throwable (Optional) The throwable object associated with the fatal message.
          * @return void
+         * @throws LoggingException
          */
         public static function fatal(string $application_name, string $message, ?Throwable $throwable=null): void
         {
@@ -227,7 +214,14 @@
         {
             set_exception_handler(static function(Throwable $throwable)
             {
-                self::error('Runtime', $throwable->getMessage(), $throwable);
+                try
+                {
+                    self::error('Runtime', $throwable->getMessage(), $throwable);
+                }
+                catch(LoggingException)
+                {
+                    return;
+                }
             });
         }
 
@@ -239,21 +233,6 @@
         public static function unregisterExceptionHandler(): void
         {
             set_exception_handler(null);
-        }
-
-        /**
-         * Gets the runtime options.
-         *
-         * @return RuntimeOptions The runtime options.
-         */
-        public static function getRuntimeOptions(): RuntimeOptions
-        {
-            if(self::$runtime_options === null)
-            {
-                self::$runtime_options = new RuntimeOptions();
-            }
-
-            return self::$runtime_options;
         }
 
     }

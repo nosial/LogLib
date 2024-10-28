@@ -80,11 +80,9 @@
          *                 - SILENT (0)
          *             If no log level is configured or the configured level is not recognized, the INFO level (4) will be returned by default.
          */
-        public static function getLogLevel(): LogLevel
+        private static function parseLogLevel(string $logLevel): LogLevel
         {
-            $args = Parse::getArguments();
-
-            switch(strtolower(($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: 'info') ?? 'info')))
+            switch(strtolower($logLevel))
             {
                 case LogLevel::DEBUG:
                 case 'debug':
@@ -154,13 +152,12 @@
          * Returns a string representation of the backtrace for the given event.
          *
          * @param Event $event The event object for which to generate the backtrace string.
-         * @param bool $ansi Determines whether the output should include ANSI escape codes for colored output. Default is false.
          * @return string|null A string representation of the backtrace for the event, or null if the event has no backtrace.
          *                    The output format is: ClassName::methodName() or functionName() depending on the type of call.
          *                    If $ansi is true, the output will be colored using ANSI escape codes.
          *                    If the event has no backtrace, the constant CallType::LAMBDA_CALL will be returned.
          */
-        public static function getTraceString(Event $event, bool $ansi=false): ?string
+        public static function getTraceString(Event $event): ?string
         {
             if($event->getBacktrace() === null || count($event->getBacktrace()) === 0)
             {
@@ -174,7 +171,7 @@
             {
                 if(isset($backtrace['file']))
                 {
-                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '');
+                    return "\033[1;37m" . basename($backtrace['file']) . "\033[0m";
                 }
 
                 return basename($backtrace['file']);
@@ -184,7 +181,7 @@
             {
                 if(isset($backtrace['file']))
                 {
-                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '') . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
+                    return "\033[1;37m" . basename($backtrace['file']) . "\033[0m" . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
                 }
 
                 return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
@@ -194,26 +191,18 @@
             {
                 if(isset($backtrace['file']))
                 {
-                    return ($ansi ? "\033[1;37m" : '') . basename($backtrace['file']) . ($ansi ? "\033[0m" : '') . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
+                    return "\033[1;37m" . basename($backtrace['file']) . "\033[0m" . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
                 }
 
                 return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
             }
 
-            if($ansi)
-            {
-                $function = sprintf("\033[1;37m%s\033[0m", $backtrace['function']);
-                $class = null;
+            $function = sprintf("\033[1;37m%s\033[0m", $backtrace['function']);
+            $class = null;
 
-                if(isset($backtrace["class"]))
-                {
-                    $class = sprintf("\033[1;37m%s\033[0m", $backtrace['class']);
-                }
-            }
-            else
+            if(isset($backtrace["class"]))
             {
-                $function = $backtrace['function'];
-                $class = $backtrace['class'] ?? null;
+                $class = sprintf("\033[1;37m%s\033[0m", $backtrace['class']);
             }
 
             if($class === null)
@@ -253,4 +242,94 @@
             ];
         }
 
+        public static function getLogDirectory(): string
+        {
+            $args = Parse::getArguments();
+            $log_directory = ($args['log-directory'] ?? getenv('LOG_DIRECTORY') ?? null);
+
+            if($log_directory === null)
+            {
+                return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'logs';
+            }
+
+            return $log_directory;
+        }
+
+
+        public static function getConsoleLoggingEnabled(): bool
+        {
+            if(isset(Parse::getArguments()['log-level']))
+            {
+                return true;
+            }
+
+            if(self::runningInCli())
+            {
+                return true;
+            }
+
+            if(getenv('CLI_LOGGING') === 'true' || getenv('CLI_LOGGING') === '1')
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static function getConsoleLoggingLevel(): LogLevel
+        {
+            return self::parseLogLevel(($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: 'info') ?? 'info'));
+        }
+
+        public static function getFileLoggingEnabled(): bool
+        {
+            if(isset(Parse::getArguments()['log-directory']))
+            {
+                return true;
+            }
+
+            if(getenv('LOG_DIRECTORY') !== null)
+            {
+                return true;
+            }
+
+            if(!is_writable(self::getLogDirectory()))
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+        public static function getFileLoggingLevel(): LogLevel
+        {
+            if(getenv('FILE_LOG_LEVEL') !== null || isset(Parse::getArguments()['file-log-level']))
+            {
+                return self::parseLogLevel(getenv('FILE_LOG_LEVEL'));
+            }
+
+            return LogLevel::WARNING;
+        }
+
+        public static function getFileLoggingDirectory(): string
+        {
+            $args = Parse::getArguments();
+            $log_directory = ($args['log-directory'] ?? getenv('LOG_DIRECTORY') ?? null);
+
+            if($log_directory === null)
+            {
+                return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'logs';
+            }
+
+            return $log_directory;
+        }
+
+        public static function sanitizeFileName(string $name): string
+        {
+            // Replace spaces with hyphens
+            $name = str_replace(' ', '-', $name);
+
+            // Remove illegal characters and replace escapable characters with underscores
+            return preg_replace('/[\/:*?"<>|.]/', '_', $name);
+        }
     }
