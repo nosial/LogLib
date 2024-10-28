@@ -214,7 +214,6 @@
             return "{$class}{$type->value}{$function}" . CallType::FUNCTION_CALL->value;
         }
 
-
         /**
          * Converts an exception object to an array representation.
          *
@@ -242,20 +241,30 @@
             ];
         }
 
+        /**
+         * Retrieves the directory path for logging purposes.
+         *
+         * @return string The path to the log directory, or a temporary directory if not set.
+         */
         public static function getLogDirectory(): string
         {
             $args = Parse::getArguments();
-            $log_directory = ($args['log-directory'] ?? getenv('LOG_DIRECTORY') ?? null);
+            $LOGGING_DIRECTORY = ($args['logging-directory'] ?? getenv('LOGGING_DIRECTORY') ?? null);
 
-            if($log_directory === null)
+            if($LOGGING_DIRECTORY === null)
             {
                 return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'logs';
             }
 
-            return $log_directory;
+            return $LOGGING_DIRECTORY;
         }
 
-
+        /**
+         * Determines if console logging is enabled based on command-line arguments,
+         * execution environment, or environment variables.
+         *
+         * @return bool True if console logging is enabled, false otherwise.
+         */
         public static function getConsoleLoggingEnabled(): bool
         {
             if(isset(Parse::getArguments()['log-level']))
@@ -268,7 +277,7 @@
                 return true;
             }
 
-            if(getenv('CLI_LOGGING') === 'true' || getenv('CLI_LOGGING') === '1')
+            if(getenv('LOGGING_CONSOLE') === 'true' || getenv('LOGGING_CONSOLE') === '1')
             {
                 return true;
             }
@@ -276,19 +285,29 @@
             return false;
         }
 
+        /**
+         * Retrieves the current logging level for console output.
+         *
+         * @return LogLevel The determined logging level.
+         */
         public static function getConsoleLoggingLevel(): LogLevel
         {
             return self::parseLogLevel(($args['log'] ?? $args['log-level'] ?? (getenv('LOG_LEVEL') ?: 'info') ?? 'info'));
         }
 
+        /**
+         * Determines if file logging is enabled based on various conditions.
+         *
+         * @return bool True if file logging is enabled, false otherwise.
+         */
         public static function getFileLoggingEnabled(): bool
         {
-            if(isset(Parse::getArguments()['log-directory']))
+            if(isset(Parse::getArguments()['logging-directory']))
             {
                 return true;
             }
 
-            if(getenv('LOG_DIRECTORY') !== null)
+            if(getenv('LOGGING_DIRECTORY') !== null)
             {
                 return true;
             }
@@ -301,29 +320,45 @@
             return false;
         }
 
+        /**
+         * Retrieves the logging level for file outputs based on environment variables or command line arguments.
+         *
+         * @return LogLevel The logging level to be used for file logging.
+         */
         public static function getFileLoggingLevel(): LogLevel
         {
-            if(getenv('FILE_LOG_LEVEL') !== null || isset(Parse::getArguments()['file-log-level']))
+            if(getenv('LOGGING_FILE_LEVEL') !== null || isset(Parse::getArguments()['logging-file-level']))
             {
-                return self::parseLogLevel(getenv('FILE_LOG_LEVEL'));
+                return self::parseLogLevel(getenv('LOGGING_FILE_LEVEL'));
             }
 
             return LogLevel::WARNING;
         }
 
+        /**
+         * Returns the directory path for file logging.
+         *
+         * @return string The logging directory path.
+         */
         public static function getFileLoggingDirectory(): string
         {
             $args = Parse::getArguments();
-            $log_directory = ($args['log-directory'] ?? getenv('LOG_DIRECTORY') ?? null);
+            $LOGGING_DIRECTORY = ($args['logging-directory'] ?? getenv('LOGGING_DIRECTORY') ?? null);
 
-            if($log_directory === null)
+            if($LOGGING_DIRECTORY === null)
             {
                 return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'logs';
             }
 
-            return $log_directory;
+            return $LOGGING_DIRECTORY;
         }
 
+        /**
+         * Sanitizes a file name by replacing spaces with hyphens and removing illegal characters.
+         *
+         * @param string $name The file name to sanitize.
+         * @return string The sanitized file name.
+         */
         public static function sanitizeFileName(string $name): string
         {
             // Replace spaces with hyphens
