@@ -4,10 +4,6 @@
 
     enum ConsoleColors : string
     {
-        case BLACK = "0;30";
-
-        case DARK_GRAY = "1;30";
-
         case BLUE = "0;34";
 
         case LIGHT_BLUE = "1;34";
@@ -44,8 +40,6 @@
          * @var array
          */
         public const ALL = [
-            self::BLACK,
-            self::DARK_GRAY,
             self::BLUE,
             self::LIGHT_BLUE,
             self::GREEN,
