@@ -212,7 +212,15 @@
                 return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
             }
 
-            $function = sprintf("\033[1;37m%s\033[0m", $backtrace['function']);
+            if($ansi)
+            {
+                $function = sprintf("\033[1;37m%s\033[0m", $backtrace['function']);
+            }
+            else
+            {
+                $function = $backtrace['function'];
+            }
+
             $class = null;
 
             if(isset($backtrace["class"]))
