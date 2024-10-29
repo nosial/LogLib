@@ -45,8 +45,7 @@
         private function lock(): void
         {
             $this->fileHandle = fopen($this->filePath, 'a');
-
-            if (!$this->fileHandle)
+            if ($this->fileHandle === false)
             {
                 throw new RuntimeException("Unable to open the file: " . $this->filePath);
             }
@@ -72,8 +71,12 @@
          */
         private function unlock(): void
         {
-            flock($this->fileHandle, LOCK_UN); // Release the lock
-            fclose($this->fileHandle); // Close the file handle
+            if ($this->fileHandle !== null)
+            {
+                flock($this->fileHandle, LOCK_UN); // Release the lock
+                fclose($this->fileHandle); // Close the file handle
+                $this->fileHandle = null; // Reset the file handle
+            }
         }
 
         /**
@@ -85,7 +88,15 @@
         public function append(string $data): void
         {
             $this->lock();
-            fwrite($this->fileHandle, $data);
+
+            if ($this->fileHandle !== false)
+            {
+                if (fwrite($this->fileHandle, $data) === false)
+                {
+                    throw new RuntimeException("Unable to write to the file: " . $this->filePath);
+                }
+            }
+
             $this->unlock();
         }
 
