@@ -16,8 +16,8 @@ use Throwable;
 class ConsoleLogging implements LogHandlerInterface
 {
     private static array $application_colors = [];
-    private static float|int|null $last_tick_time;
-    private static ?int $largest_tick_length;
+    private static float|int|null $last_tick_time = null;
+    private static ?int $largest_tick_length = null;
 
     /**
      * @inheritDoc
