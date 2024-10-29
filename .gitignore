@@ -1,1 +1,3 @@
 build/
+/.idea/phpunit.xml
+/.phpunit.result.cache
