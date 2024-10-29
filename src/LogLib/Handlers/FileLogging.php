@@ -93,7 +93,7 @@ class FileLogging implements LogHandlerInterface
             }
         }
 
-        $logging_file = $logging_directory . DIRECTORY_SEPARATOR . Utilities::sanitizeFileName($application->getApplicationName()) . date('Y-m-d') . '.log';
+        $logging_file = $logging_directory . DIRECTORY_SEPARATOR . Utilities::sanitizeFileName($application->getApplicationName()) . '-' . date('Y-m-d') . '.log';
 
         if(!file_exists($logging_file))
         {
