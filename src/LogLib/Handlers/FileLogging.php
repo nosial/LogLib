@@ -28,7 +28,7 @@ class FileLogging implements LogHandlerInterface
 
         if(Validate::checkLevelType(LogLevel::DEBUG, $application->getConsoleLoggingLevel()))
         {
-            $backtrace_output = Utilities::getTraceString($event);
+            $backtrace_output = Utilities::getTraceString($event, false);
 
             $output = sprintf("[%s] [%s] [%s] %s %s" . PHP_EOL,
                 self::getTimestamp(), $application->getApplicationName(), $event->getLevel()->name, $backtrace_output, $event->getMessage()
@@ -41,9 +41,9 @@ class FileLogging implements LogHandlerInterface
         }
         else if(Validate::checkLevelType(LogLevel::VERBOSE, $application->getConsoleLoggingLevel()))
         {
-            $backtrace_output = Utilities::getTraceString($event);
+            $backtrace_output = Utilities::getTraceString($event, false);
 
-            $output = sprintf("[%s] [%s] %s %s" . PHP_EOL, $application->getApplicationName(), $event->getLevel()->name, $backtrace_output, $event->getMessage());
+            $output = sprintf("[%s] [%s] [%s] %s %s" . PHP_EOL, self::getTimestamp(), $application->getApplicationName(), $event->getLevel()->name, $backtrace_output, $event->getMessage());
 
             if($event->getException() !== null)
             {
@@ -52,7 +52,7 @@ class FileLogging implements LogHandlerInterface
         }
         else
         {
-            $output = sprintf("[%s] [%s] %s" . PHP_EOL, $application->getApplicationName(), $event->getLevel()->name, $event->getMessage());
+            $output = sprintf("[%s] [%s] [%s] %s" . PHP_EOL, self::getTimestamp(), $application->getApplicationName(), $event->getLevel()->name, $event->getMessage());
         }
 
         self::getLogger($application)->append($output);

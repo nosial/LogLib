@@ -157,7 +157,7 @@
          *                    If $ansi is true, the output will be colored using ANSI escape codes.
          *                    If the event has no backtrace, the constant CallType::LAMBDA_CALL will be returned.
          */
-        public static function getTraceString(Event $event): ?string
+        public static function getTraceString(Event $event, bool $ansi=true): ?string
         {
             if($event->getBacktrace() === null || count($event->getBacktrace()) === 0)
             {
@@ -171,7 +171,12 @@
             {
                 if(isset($backtrace['file']))
                 {
-                    return "\033[1;37m" . basename($backtrace['file']) . "\033[0m";
+                    if($ansi)
+                    {
+                        return "\033[1;37m" . basename($backtrace['file']) . "\033[0m";
+                    }
+
+                    return basename($backtrace['file']);
                 }
 
                 return basename($backtrace['file']);
@@ -181,7 +186,12 @@
             {
                 if(isset($backtrace['file']))
                 {
-                    return "\033[1;37m" . basename($backtrace['file']) . "\033[0m" . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
+                    if($ansi)
+                    {
+                        return "\033[1;37m" . basename($backtrace['file']) . "\033[0m" . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
+                    }
+
+                    return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
                 }
 
                 return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
@@ -191,7 +201,12 @@
             {
                 if(isset($backtrace['file']))
                 {
-                    return "\033[1;37m" . basename($backtrace['file']) . "\033[0m" . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
+                    if($ansi)
+                    {
+                        return "\033[1;37m" . basename($backtrace['file']) . "\033[0m" . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
+                    }
+
+                    return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
                 }
 
                 return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
@@ -202,7 +217,14 @@
 
             if(isset($backtrace["class"]))
             {
-                $class = sprintf("\033[1;37m%s\033[0m", $backtrace['class']);
+                if($ansi)
+                {
+                    $class = sprintf("\033[1;37m%s\033[0m", $backtrace['class']);
+                }
+                else
+                {
+                    $class = $backtrace['class'];
+                }
             }
 
             if($class === null)
