@@ -51,7 +51,7 @@ jobs:
 
       - name: Build project
         run: |
-          ncc build --config release --log-level debug
+          ncc build --config release --build-source --log-level debug
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -100,7 +100,7 @@ jobs:
 
       - name: Build project
         run: |
-          ncc build --config release-compressed --log-level debug
+          ncc build --config release-compressed --build-source --log-level debug
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -149,7 +149,7 @@ jobs:
 
       - name: Build project
         run: |
-          ncc build --config debug-compressed --log-level debug
+          ncc build --config debug-compressed --build-source --log-level debug
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -198,7 +198,7 @@ jobs:
 
       - name: Build project
         run: |
-          ncc build --config release-executable --log-level debug
+          ncc build --config release-executable --build-source --log-level debug
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -247,7 +247,7 @@ jobs:
 
       - name: Build project
         run: |
-          ncc build --config release-compressed-executable --log-level debug
+          ncc build --config release-compressed-executable --build-source --log-level debug
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -296,7 +296,7 @@ jobs:
 
       - name: Build project
         run: |
-          ncc build --config debug-compressed-executable --log-level debug
+          ncc build --config debug-compressed-executable --build-source --log-level debug
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
