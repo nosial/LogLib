@@ -349,9 +349,14 @@
          */
         public static function getFileLoggingLevel(): LogLevel
         {
-            if(getenv('LOGGING_FILE_LEVEL') !== null || isset(Parse::getArguments()['logging-file-level']))
+            if(getenv('LOGGING_FILE_LEVEL') !== null)
             {
                 return self::parseLogLevel(getenv('LOGGING_FILE_LEVEL'));
+            }
+
+            if(isset(Parse::getArguments()['logging-file-level']))
+            {
+                return self::parseLogLevel(Parse::getArguments()['logging-file-level']);
             }
 
             return LogLevel::WARNING;
