@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This update introduces minor improvements
 
+### Changed
+ - Refactored exception handling in FileLogging where it will always attempt to print the exception no matter
+   the log level for as long as the log level isn't silent
+
 
 ## [2.0.1] - 2024-10-29
 

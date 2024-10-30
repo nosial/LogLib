@@ -29,30 +29,23 @@ class FileLogging implements LogHandlerInterface
         if(Validate::checkLevelType(LogLevel::DEBUG, $application->getConsoleLoggingLevel()))
         {
             $backtrace_output = Utilities::getTraceString($event, false);
-
             $output = sprintf("[%s] [%s] [%s] %s %s" . PHP_EOL,
                 self::getTimestamp(), $application->getApplicationName(), $event->getLevel()->name, $backtrace_output, $event->getMessage()
             );
-
-            if($event->getException() !== null)
-            {
-                $output .= self::outException($event->getException());
-            }
         }
         else if(Validate::checkLevelType(LogLevel::VERBOSE, $application->getConsoleLoggingLevel()))
         {
             $backtrace_output = Utilities::getTraceString($event, false);
-
             $output = sprintf("[%s] [%s] [%s] %s %s" . PHP_EOL, self::getTimestamp(), $application->getApplicationName(), $event->getLevel()->name, $backtrace_output, $event->getMessage());
-
-            if($event->getException() !== null)
-            {
-                $output .= self::outException($event->getException());
-            }
         }
         else
         {
             $output = sprintf("[%s] [%s] [%s] %s" . PHP_EOL, self::getTimestamp(), $application->getApplicationName(), $event->getLevel()->name, $event->getMessage());
+        }
+
+        if($event->getException() !== null)
+        {
+            $output .= self::outException($event->getException());
         }
 
         self::getLogger($application)->append($output);
