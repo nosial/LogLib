@@ -213,11 +213,13 @@
          */
         public static function registerExceptionHandler(): void
         {
-            set_exception_handler(static function(Throwable $throwable)
+
+            // Handle uncaught exceptions
+            set_exception_handler(static function(Throwable $exception): void
             {
                 try
                 {
-                    self::error('Runtime', $throwable->getMessage(), $throwable);
+                    self::error('Runtime', $exception->getMessage(), $exception);
                 }
                 catch(Exception)
                 {
@@ -225,28 +227,61 @@
                 }
             });
 
-            // Register error handler
-            set_error_handler(static function($errno, $errstr, $errfile, $errline)
+            // Handle warnings and notices
+            set_error_handler(static function(int $errno, string $errstr, string $errfile = '', int $errline = 0): bool
             {
-                // Convert error to exception and throw it
                 try
                 {
-                    self::warning('Runtime', sprintf("%s:%s (%s) %s", $errfile, $errline, $errno, $errstr));
+                    // Convert error to exception for consistent handling
+                    $exception = new ErrorException($errstr, 0, $errno, $errfile, $errline);
+
+                    // Handle different error types
+                    switch ($errno)
+                    {
+                        case E_ERROR:
+                        case E_PARSE:
+                        case E_CORE_ERROR:
+                        case E_COMPILE_ERROR:
+                        case E_USER_ERROR:
+                            self::error('Runtime', $errstr, $exception);
+                            break;
+
+                        case E_USER_DEPRECATED:
+                        case E_DEPRECATED:
+                        case E_USER_NOTICE:
+                        case E_NOTICE:
+                        case E_USER_WARNING:
+                        case E_WARNING:
+                        default:
+                            self::warning('Runtime', $errstr, $exception);
+                            break;
+                    }
                 }
                 catch(Exception)
                 {
-                    return;
+                    return false;
                 }
+
+                // Return true to prevent PHP's internal error handler
+                return true;
             });
 
-            register_shutdown_function(static function()
+            // Handle fatal errors
+            register_shutdown_function(static function(): void
             {
                 $error = error_get_last();
-                if ($error !== null && ($error['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR)))
+
+                if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR]))
                 {
-                    // Convert fatal error to exception and handle it
-                    $exception = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
-                    self::error('Fatal', $exception->getMessage(), $exception);
+                    try
+                    {
+                        $exception = new ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
+                        self::error('Fatal Error', $error['message'], $exception);
+                    }
+                    catch(Exception)
+                    {
+                        return;
+                    }
                 }
             });
         }
@@ -260,5 +295,4 @@
         {
             set_exception_handler(null);
         }
-
     }

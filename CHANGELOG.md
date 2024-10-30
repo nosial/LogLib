@@ -12,6 +12,7 @@ This update introduces minor improvements
 ### Changed
  - Refactored exception handling in FileLogging where it will always attempt to print the exception no matter
    the log level for as long as the log level isn't silent
+ - Implement enhanced error and exception handling
 
 
 ## [2.0.1] - 2024-10-29
