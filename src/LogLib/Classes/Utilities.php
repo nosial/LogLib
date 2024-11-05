@@ -157,36 +157,34 @@
          *                    If $ansi is true, the output will be colored using ANSI escape codes.
          *                    If the event has no backtrace, the constant CallType::LAMBDA_CALL will be returned.
          */
-        public static function getTraceString(Event $event, bool $ansi=true): ?string
+        public static function getTraceString(Event $event, bool $ansi = true): ?string
         {
-            if($event->getBacktrace() === null || count($event->getBacktrace()) === 0)
+            if ($event->getBacktrace() === null || count($event->getBacktrace()) === 0)
             {
                 return CallType::LAMBDA_CALL->value;
             }
 
             $backtrace = $event->getBacktrace()[count($event->getBacktrace()) - 1];
-
             // Ignore \LogLib namespace
-            if(isset($backtrace['class']) && str_starts_with($backtrace['class'], 'LogLib'))
+            if (isset($backtrace['class']) && str_starts_with($backtrace['class'], 'LogLib'))
             {
-                if(isset($backtrace['file']))
+                if (isset($backtrace['file']))
                 {
-                    if($ansi)
+                    if ($ansi)
                     {
                         return "\033[1;37m" . basename($backtrace['file']) . "\033[0m";
                     }
-
                     return basename($backtrace['file']);
                 }
 
-                return basename($backtrace['file']);
+                return self::determineCallType($event->getBacktrace())->value; // Return a placeholder value
             }
 
-            if($backtrace['function'] === '{closure}')
+            if ($backtrace['function'] === '{closure}')
             {
-                if(isset($backtrace['file']))
+                if (isset($backtrace['file']))
                 {
-                    if($ansi)
+                    if ($ansi)
                     {
                         return "\033[1;37m" . basename($backtrace['file']) . "\033[0m" . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
                     }
@@ -194,25 +192,24 @@
                     return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
                 }
 
-                return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value;
+                return self::determineCallType($event->getBacktrace())->value . CallType::STATIC_CALL->value . CallType::LAMBDA_CALL->value; // Adjusted to handle missing 'file'
             }
 
-            if($backtrace['function'] === 'eval')
+            if ($backtrace['function'] === 'eval')
             {
-                if(isset($backtrace['file']))
+                if (isset($backtrace['file']))
                 {
-                    if($ansi)
+                    if ($ansi)
                     {
                         return "\033[1;37m" . basename($backtrace['file']) . "\033[0m" . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
                     }
 
                     return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
                 }
-
-                return basename($backtrace['file']) . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value;
+                return self::determineCallType($event->getBacktrace())->value . CallType::STATIC_CALL->value . CallType::EVAL_CALL->value; // Adjusted to handle missing 'file'
             }
 
-            if($ansi)
+            if ($ansi)
             {
                 $function = sprintf("\033[1;37m%s\033[0m", $backtrace['function']);
             }
@@ -223,9 +220,9 @@
 
             $class = null;
 
-            if(isset($backtrace["class"]))
+            if (isset($backtrace["class"]))
             {
-                if($ansi)
+                if ($ansi)
                 {
                     $class = sprintf("\033[1;37m%s\033[0m", $backtrace['class']);
                 }
@@ -235,13 +232,39 @@
                 }
             }
 
-            if($class === null)
+            if ($class === null)
             {
                 return $function . CallType::FUNCTION_CALL->value;
             }
 
             $type = ($backtrace['type'] === CallType::METHOD_CALL ? CallType::METHOD_CALL : CallType::STATIC_CALL);
             return "{$class}{$type->value}{$function}" . CallType::FUNCTION_CALL->value;
+        }
+
+        /**
+         * Determines the type of call based on the provided backtrace.
+         *
+         * @param array $backtrace The backtrace information of the calling code.
+         * @return CallType The type of call detected.
+         */
+        private static function determineCallType(array $backtrace): CallType
+        {
+            if(BacktraceParser::fromErrorHandler($backtrace))
+            {
+                return CallType::ERROR_HANDLER;
+            }
+
+            if(BacktraceParser::fromExceptionHandler($backtrace))
+            {
+                return CallType::EXCEPTION_HANDLER;
+            }
+
+            if(BacktraceParser::fromShutdownHandler($backtrace))
+            {
+                return CallType::SHUTDOWN_HANDLER;
+            }
+
+            return CallType::UNKNOWN_FILE;
         }
 
         /**
