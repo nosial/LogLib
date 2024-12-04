@@ -133,7 +133,10 @@ class FileLogging implements LogHandlerInterface
             $output .= 'Stack Trace:' . PHP_EOL;
             foreach($trace as $item)
             {
-                $output .=  ' - ' . $item['file'] . ':' . $item['line'] . PHP_EOL;
+                if(isset($item['file']) && isset($item['line']))
+                {
+                    $output .=  ' - ' . $item['file'] . ':' . $item['line'] . PHP_EOL;
+                }
             }
         }
 
