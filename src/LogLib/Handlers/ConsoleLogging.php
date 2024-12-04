@@ -208,7 +208,10 @@ class ConsoleLogging implements LogHandlerInterface
             print('Stack Trace:' . PHP_EOL);
             foreach($trace as $item)
             {
-                print( ' - ' . self::color($item['file'], ConsoleColors::RED) . ':' . $item['line'] . PHP_EOL);
+                if(isset($item['file']) && isset($item['line']))
+                {
+                    print( ' - ' . self::color($item['file'], ConsoleColors::RED) . ':' . $item['line'] . PHP_EOL);
+                }
             }
         }
 
