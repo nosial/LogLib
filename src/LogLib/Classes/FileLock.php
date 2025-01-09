@@ -42,12 +42,12 @@
          *
          * @throws RuntimeException if unable to open or lock the file.
          */
-        private function lock(): void
+        private function lock(): bool
         {
-            $this->fileHandle = fopen($this->filePath, 'a');
+            $this->fileHandle = @fopen($this->filePath, 'a');
             if ($this->fileHandle === false)
             {
-                throw new RuntimeException("Unable to open the file: " . $this->filePath);
+                return false;
             }
 
             // Keep trying to acquire the lock until it succeeds
@@ -64,6 +64,8 @@
                 flock($this->fileHandle, LOCK_UN);
                 $this->lock();
             }
+
+            return true;
         }
 
         /**
@@ -87,7 +89,11 @@
          */
         public function append(string $data): void
         {
-            $this->lock();
+            if(!$this->lock())
+            {
+                // Do not proceed if the file cannot be locked
+                return;
+            }
 
             if ($this->fileHandle !== false)
             {
