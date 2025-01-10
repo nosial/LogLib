@@ -21,6 +21,12 @@ class FileLogging implements LogHandlerInterface
      */
     public static function handle(Application $application, Event $event): void
     {
+        // If we're running in a Web environment, return
+        if(!Utilities::runningInCli())
+        {
+            return;
+        }
+
         if(!Validate::checkLevelType($event->getLevel(), $application->getFileLoggingLevel()))
         {
             return;
@@ -88,9 +94,9 @@ class FileLogging implements LogHandlerInterface
 
         $logging_file = $logging_directory . DIRECTORY_SEPARATOR . Utilities::sanitizeFileName($application->getApplicationName()) . '-' . date('Y-m-d') . '.log';
 
-        if(!file_exists($logging_file))
+        if(!file_exists($logging_file) && !@touch($logging_file))
         {
-            touch($logging_file);
+            throw new RuntimeException(sprintf("Cannot write to %s due to insufficient permissions", $logging_file));
         }
 
         return $logging_file;

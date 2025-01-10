@@ -24,7 +24,6 @@ class ConsoleLogging implements LogHandlerInterface
      */
     public static function handle(Application $application, Event $event): void
     {
-        // Check if the application is running in a CLI environment, if not, return
         if(!Utilities::runningInCli())
         {
             return;
