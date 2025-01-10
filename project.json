@@ -20,7 +20,7 @@
         "package": "net.nosial.loglib",
         "company": "Nosial",
         "copyright": "Copyright (c) 2022-2023 Nosial",
-        "version": "2.0.5",
+        "version": "2.0.6",
         "uuid": "de1deca6-7b65-11ed-a8b0-a172264634d8"
     },
     "build": {
