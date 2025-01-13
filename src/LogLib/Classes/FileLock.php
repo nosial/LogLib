@@ -32,8 +32,11 @@
             // Create the file if it doesn't exist
             if (!file_exists($filePath))
             {
-                $this->fileHandle = fopen($filePath, 'w');
-                fclose($this->fileHandle);
+                // Create the file
+                touch($filePath);
+
+                // Set the file permissions to 0666
+                chmod($filePath, 0666);
             }
         }
 

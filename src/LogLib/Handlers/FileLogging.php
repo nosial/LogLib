@@ -21,12 +21,6 @@ class FileLogging implements LogHandlerInterface
      */
     public static function handle(Application $application, Event $event): void
     {
-        // If we're running in a Web environment, return
-        if(!Utilities::runningInCli())
-        {
-            return;
-        }
-
         if(!Validate::checkLevelType($event->getLevel(), $application->getFileLoggingLevel()))
         {
             return;
